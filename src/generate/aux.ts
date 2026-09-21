@@ -99,7 +99,9 @@ export const DEPENDABOT_BY_LANGUAGE: Record<string, string[]> = {
 export function renderDependabot(detected: DetectedLanguage[]): string {
   const ecosystems: string[] = [];
   for (const entry of detected) {
-    for (const slug of entry.language.dependabot ?? DEPENDABOT_BY_LANGUAGE[entry.language.id] ?? []) {
+    for (const slug of entry.language.dependabot ??
+      DEPENDABOT_BY_LANGUAGE[entry.language.id] ??
+      []) {
       if (!ecosystems.includes(slug)) ecosystems.push(slug);
     }
   }

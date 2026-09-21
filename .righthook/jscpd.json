@@ -1,0 +1,15 @@
+{
+  "threshold": 5,
+  "min-tokens": 70,
+  "reporters": [
+    "console"
+  ],
+  "ignore": [
+    "**/node_modules/**",
+    "**/vendor/**",
+    "**/target/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**"
+  ]
+}

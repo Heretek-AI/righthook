@@ -18,7 +18,9 @@ export const dotnet: LanguageSpec = {
       ciArgv: 'dotnet format whitespace --verify-no-changes',
       priority: 1,
       stageFixed: true,
-      install: { url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-format' },
+      install: {
+        url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-format',
+      },
     },
     {
       id: 'dotnet-analyzers',
@@ -27,7 +29,9 @@ export const dotnet: LanguageSpec = {
       argv: 'dotnet format analyzers --verify-no-changes',
       ciArgv: 'dotnet format analyzers --verify-no-changes',
       priority: 2,
-      install: { url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-format' },
+      install: {
+        url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-format',
+      },
     },
     {
       id: 'dotnet-build',
@@ -36,7 +40,9 @@ export const dotnet: LanguageSpec = {
       argv: 'dotnet build --no-restore -warnaserror',
       ciArgv: 'dotnet build --no-restore -warnaserror',
       priority: 4,
-      install: { url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-build' },
+      install: {
+        url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-build',
+      },
     },
     {
       id: 'dotnet-test',
@@ -47,7 +53,9 @@ export const dotnet: LanguageSpec = {
       priority: 2,
       coverageArtifact: 'cobertura',
       coveragePath: 'TestResults/**/coverage.cobertura.xml',
-      install: { url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-test' },
+      install: {
+        url: 'https://learn.microsoft.com/dotnet/core/tools/dotnet-test',
+      },
     },
   ],
 };
@@ -174,7 +182,8 @@ export const dart: LanguageSpec = {
       category: 'format',
       hook: 'pre-commit',
       argv: 'dart format {staged_files}',
-      ciArgv: "xargs -0 -r dart format --output=none --set-exit-if-changed", ciFiles: true,
+      ciArgv: 'xargs -0 -r dart format --output=none --set-exit-if-changed',
+      ciFiles: true,
       priority: 1,
       stageFixed: true,
       install: { url: 'https://dart.dev/tools/dart-format' },
@@ -209,7 +218,10 @@ export const cpp: LanguageSpec = {
         'xargs -r clang-format --dry-run --Werror',
       priority: 1,
       stageFixed: true,
-      install: { brew: 'brew install clang-format', url: 'https://clang.llvm.org/docs/ClangFormat.html' },
+      install: {
+        brew: 'brew install clang-format',
+        url: 'https://clang.llvm.org/docs/ClangFormat.html',
+      },
     },
     {
       id: 'cppcheck',
@@ -222,7 +234,10 @@ export const cpp: LanguageSpec = {
         'cppcheck --enable=warning,style,performance,portability --inline-suppr ' +
         '--error-exitcode=1 --suppress=missingIncludeSystem .',
       priority: 2,
-      install: { brew: 'brew install cppcheck', url: 'https://github.com/cppcheck-qa/cppcheck' },
+      install: {
+        brew: 'brew install cppcheck',
+        url: 'https://github.com/cppcheck-qa/cppcheck',
+      },
     },
     {
       id: 'clang-tidy',
@@ -232,7 +247,10 @@ export const cpp: LanguageSpec = {
       ciArgv: 'git ls-files "*.c" "*.cc" "*.cpp" | xargs -r clang-tidy -p build',
       priority: 6,
       ciOnly: true,
-      install: { brew: 'brew install llvm', url: 'https://clang.llvm.org/extra/clang-tidy' },
+      install: {
+        brew: 'brew install llvm',
+        url: 'https://clang.llvm.org/extra/clang-tidy',
+      },
     },
     {
       id: 'cmake-test',
@@ -265,10 +283,14 @@ export const terraform: LanguageSpec = {
       category: 'format',
       hook: 'pre-commit',
       argv: 'terraform fmt -recursive',
-      ciArgv: "xargs -0 -r terraform fmt -check", ciFiles: true,
+      ciArgv: 'xargs -0 -r terraform fmt -check',
+      ciFiles: true,
       priority: 1,
       stageFixed: true,
-      install: { brew: 'brew install terraform', url: 'https://developer.hashicorp.com/terraform/cli' },
+      install: {
+        brew: 'brew install terraform',
+        url: 'https://developer.hashicorp.com/terraform/cli',
+      },
     },
     {
       id: 'tflint',
@@ -277,7 +299,10 @@ export const terraform: LanguageSpec = {
       argv: 'tflint --recursive',
       ciArgv: 'tflint --recursive',
       priority: 2,
-      install: { brew: 'brew install tflint', url: 'https://github.com/terraform-linters/tflint' },
+      install: {
+        brew: 'brew install tflint',
+        url: 'https://github.com/terraform-linters/tflint',
+      },
     },
     {
       id: 'terraform-validate',
@@ -286,7 +311,10 @@ export const terraform: LanguageSpec = {
       argv: 'terraform validate',
       ciArgv: 'terraform validate',
       priority: 6,
-      install: { brew: 'brew install terraform', url: 'https://developer.hashicorp.com/terraform/cli' },
+      install: {
+        brew: 'brew install terraform',
+        url: 'https://developer.hashicorp.com/terraform/cli',
+      },
     },
   ],
 };

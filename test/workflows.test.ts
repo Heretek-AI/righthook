@@ -18,7 +18,10 @@ const OPTIONS: ManifestOptions = {
 
 function vendored(overrides: Partial<ManifestOptions> = {}): string {
   const fixture = makeFixture({
-    'package.json': packageJson({ typescript: '^5.7.0', '@biomejs/biome': '^2.0.0' }),
+    'package.json': packageJson({
+      typescript: '^5.7.0',
+      '@biomejs/biome': '^2.0.0',
+    }),
     'tsconfig.json': '{}\n',
     'pyproject.toml': '[project]\nname = "x"\n',
     'go.mod': 'module x\n',
@@ -62,10 +65,17 @@ test('no workflow input or context is interpolated directly into a shell script'
 
 test('every checkout keeps the token out of the workspace', () => {
   const yaml = vendored();
-  const checkouts = yaml.split('- uses: ').slice(1).filter((chunk) => chunk.startsWith('actions/checkout'));
+  const checkouts = yaml
+    .split('- uses: ')
+    .slice(1)
+    .filter((chunk) => chunk.startsWith('actions/checkout'));
   assert.ok(checkouts.length >= 4, 'the fixture should produce several jobs');
   for (const chunk of checkouts) {
-    assert.match(chunk.slice(0, 400), /persist-credentials: false/, 'artifacts would capture the token');
+    assert.match(
+      chunk.slice(0, 400),
+      /persist-credentials: false/,
+      'artifacts would capture the token',
+    );
   }
 });
 

@@ -1,0 +1,33 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-09-21T16:58:03.794Z",
+  "languages": [
+    "universal",
+    "typescript"
+  ],
+  "markers": {
+    "typescript.detect": "package.json",
+    "typescript.packageManager": "package-lock.json",
+    "typescript.variant": "biome"
+  },
+  "options": {
+    "coverageThreshold": 80,
+    "diffCoverage": 80,
+    "ciMode": "vendored",
+    "secretsTool": "betterleaks",
+    "root": "."
+  },
+  "files": {
+    ".editorconfig": "b98dc22e673777689e25d4af6f9e928f7ca9a50725ef2cf7584d3ceda75475c6",
+    ".github/dependabot.yml": "30b836e53137f5ff53994ae345c8bd06d8af3c1d18fc8a9a22b8661722c01269",
+    ".github/workflows/righthook.yml": "58dceae2c49c53532ca273ee17763afe68a93d337b138cdbd9b7e1215d5647ac",
+    ".righthook/coverage_gate.py": "3d7cbcf41ef06fe099328d11e039865ea53fd2128d86750bffa4824f6f63523a",
+    ".righthook/jscpd.json": "c37f60b2d5686fa75f56b0bd5c201c755cd7c02be0fb6c5abf2d70620d598538",
+    ".righthook/merge-conflicts.sh": "b59bf0d681a7e695b78303ed7a947e7428df4c70bd045b28c4ccf418cabc8bf7",
+    ".righthook/osv-scanner.toml": "3d06fb08f5e6e96242f5ac5489a0629269483148618e199e62f43d980b69ea62",
+    ".righthook/run.sh": "ab15d850c55b22625a235b95f9e1d0f628a7df78a60e1ba9fc7ad6f1ca26647c",
+    ".yamllint.yaml": "458b44ad8605a783e09638ee098d397b7540c06e65b0af8e7f5ee1d966435b36",
+    "commitlint.config.mjs": "71bcf4ad74fe30b1412a607d80b413c519af653837b8fc4c570401f09509f05b",
+    "lefthook.yml": "32fff1c1f95a808f456af3cb8b640eb295f32efbad140b73f62142f72abb0c8e"
+  }
+}

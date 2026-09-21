@@ -1,4 +1,5 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import type { Dirent } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { LanguageSpec, ToolSpec, VariantRule, VariantSpec } from './catalog/types.js';
@@ -34,11 +35,22 @@ export interface RepoIndex {
 export function buildRepoIndex(root: string): RepoIndex {
   const paths = new Set<string>();
   const maxEntries = 200_000;
-  const skipDirs = new Set(['node_modules', '.git', 'vendor', 'target', 'dist', 'build', '.venv', '.tox', '.next', '.gradle']);
+  const skipDirs = new Set([
+    'node_modules',
+    '.git',
+    'vendor',
+    'target',
+    'dist',
+    'build',
+    '.venv',
+    '.tox',
+    '.next',
+    '.gradle',
+  ]);
 
   const walk = (dir: string, depth: number): void => {
     if (depth > 6 || paths.size >= maxEntries) return;
-    let entries;
+    let entries: Dirent[];
     try {
       entries = readdirSync(dir, { withFileTypes: true });
     } catch {
@@ -178,7 +190,7 @@ export function declaredDeps(index: RepoIndex, rel: string): Set<string> {
 /** Evaluate a single rule against the index. */
 export function evaluateRule(index: RepoIndex, rule: VariantRule): boolean {
   if (rule.anyPath && !rule.anyPath.some((pattern) => matchIndex(index, pattern))) return false;
-  if (rule.nonePath && rule.nonePath.some((pattern) => matchIndex(index, pattern))) return false;
+  if (rule.nonePath?.some((pattern) => matchIndex(index, pattern))) return false;
   if (rule.dep) {
     const deps = declaredDeps(index, rule.dep.file);
     if (!rule.dep.names.some((name) => deps.has(name))) return false;
@@ -281,4 +293,3 @@ export function allLanguagesWithTools(languages: LanguageSpec[]): {
     .filter((language) => !language.doctorOnly)
     .map((language) => ({ language, tools: allToolsFor(language) }));
 }
-

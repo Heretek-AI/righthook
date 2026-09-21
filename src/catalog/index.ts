@@ -1,14 +1,4 @@
-import type { LanguageSpec } from './types.js';
-
-import { universal } from './languages/universal.js';
-import { typescript } from './languages/typescript.js';
-import { python } from './languages/python.js';
-import { go } from './languages/go.js';
-import { rust } from './languages/rust.js';
-import { ruby } from './languages/ruby.js';
-import { php } from './languages/php.js';
-import { java, kotlin } from './languages/jvm.js';
-import { dotnet, swift, dart, cpp, terraform } from './languages/compiled.js';
+import { cpp, dart, dotnet, swift, terraform } from './languages/compiled.js';
 import {
   ansible,
   clojure,
@@ -27,6 +17,15 @@ import {
   sql,
   zig,
 } from './languages/extended.js';
+import { go } from './languages/go.js';
+import { java, kotlin } from './languages/jvm.js';
+import { php } from './languages/php.js';
+import { python } from './languages/python.js';
+import { ruby } from './languages/ruby.js';
+import { rust } from './languages/rust.js';
+import { typescript } from './languages/typescript.js';
+import { universal } from './languages/universal.js';
+import type { LanguageSpec } from './types.js';
 
 /**
  * The tool matrix.

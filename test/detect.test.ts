@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-
+import { knownLanguageIds, languageById } from '../src/catalog/index.js';
 import { detectLanguages } from '../src/detect.js';
-import { languageById, knownLanguageIds } from '../src/catalog/index.js';
 import {
   allToolsFor,
   buildRepoIndex,
@@ -83,7 +82,7 @@ test('a polyglot repository detects every language present', () => {
     'package.json': packageJson(),
     'pyproject.toml': '[project]\nname = "x"\n',
     'go.mod': 'module x\n',
-    'Dockerfile': 'FROM scratch\n',
+    Dockerfile: 'FROM scratch\n',
     'run.sh': '#!/bin/sh\necho hi\n',
   });
   try {
@@ -113,9 +112,9 @@ test('--add-languages unions with detection', () => {
   const fixture = makeFixture({ 'go.mod': 'module x\n' });
   try {
     // Manifest order is catalog order, not the order the flags were given.
-    const ids = detectLanguages(fixture.root, { addLanguages: ['python'] }).languages.map(
-      (entry) => entry.language.id,
-    );
+    const ids = detectLanguages(fixture.root, {
+      addLanguages: ['python'],
+    }).languages.map((entry) => entry.language.id);
     assert.deepEqual(ids, ['universal', 'python', 'go']);
   } finally {
     fixture.cleanup();
@@ -141,11 +140,19 @@ test('variant resolution: eslint config beats the biome default', () => {
     'package.json': packageJson({ eslint: '^9.0.0' }),
     'eslint.config.js': 'export default [];\n',
   });
-  const biome = makeFixture({ 'package.json': packageJson({ '@biomejs/biome': '^2.0.0' }) });
+  const biome = makeFixture({
+    'package.json': packageJson({ '@biomejs/biome': '^2.0.0' }),
+  });
   const neither = makeFixture({ 'package.json': packageJson() });
   try {
-    assert.equal(selectVariant(buildRepoIndex(eslint.root), languageById('typescript')!)?.id, 'eslint');
-    assert.equal(selectVariant(buildRepoIndex(biome.root), languageById('typescript')!)?.id, 'biome');
+    assert.equal(
+      selectVariant(buildRepoIndex(eslint.root), languageById('typescript')!)?.id,
+      'eslint',
+    );
+    assert.equal(
+      selectVariant(buildRepoIndex(biome.root), languageById('typescript')!)?.id,
+      'biome',
+    );
     assert.equal(
       selectVariant(buildRepoIndex(neither.root), languageById('typescript')!)?.id,
       'biome',
@@ -191,7 +198,7 @@ test('variant resolution: Maven and Gradle are distinguished', () => {
   }
 });
 
-test('a Flutter pubspec swaps the Dart test runner for Flutter\'s', () => {
+test("a Flutter pubspec swaps the Dart test runner for Flutter's", () => {
   const flutter = makeFixture({
     'pubspec.yaml': 'name: x\ndependencies:\n  flutter:\n    sdk: flutter\n',
   });
@@ -219,7 +226,7 @@ test('a Flutter pubspec swaps the Dart test runner for Flutter\'s', () => {
 
 test('glob matching handles directories, wildcards and brace alternation', () => {
   const fixture = makeFixture({
-    'Dockerfile': 'FROM scratch\n',
+    Dockerfile: 'FROM scratch\n',
     'Dockerfile.dev': 'FROM scratch\n',
     'a/b/deep.ts': 'export {};\n',
   });
@@ -242,9 +249,21 @@ test('rules combine with AND across clauses', () => {
   });
   try {
     const index = buildRepoIndex(fixture.root);
-    assert.ok(evaluateRules(index, [{ anyPath: ['tsconfig.json'], dep: { file: 'package.json', names: ['vitest'] } }]));
     assert.ok(
-      !evaluateRules(index, [{ anyPath: ['tsconfig.json'], dep: { file: 'package.json', names: ['jest'] } }]),
+      evaluateRules(index, [
+        {
+          anyPath: ['tsconfig.json'],
+          dep: { file: 'package.json', names: ['vitest'] },
+        },
+      ]),
+    );
+    assert.ok(
+      !evaluateRules(index, [
+        {
+          anyPath: ['tsconfig.json'],
+          dep: { file: 'package.json', names: ['jest'] },
+        },
+      ]),
       'a failing clause disqualifies the whole rule',
     );
     assert.ok(evaluateRules(index, []), 'an empty rule list means always');
@@ -256,7 +275,10 @@ test('rules combine with AND across clauses', () => {
 test('allToolsFor is repository-independent and includes conditional tools', () => {
   const first = allToolsFor(languageById('go')!);
   const second = allToolsFor(languageById('go')!);
-  assert.deepEqual(first.map((t) => t.id), second.map((t) => t.id));
+  assert.deepEqual(
+    first.map((t) => t.id),
+    second.map((t) => t.id),
+  );
   const ids = first.map((tool) => tool.id);
   assert.ok(ids.includes('golangci-full'), 'a conditional tool is included in the shipped matrix');
 });

@@ -77,7 +77,10 @@ export const rust: LanguageSpec = {
       hook: 'pre-push',
       argv: 'cargo test --all-features',
       priority: 2,
-      install: { cargo: 'shipped with Cargo', url: 'https://doc.rust-lang.org/cargo' },
+      install: {
+        cargo: 'shipped with Cargo',
+        url: 'https://doc.rust-lang.org/cargo',
+      },
     },
     {
       id: 'cargo-llvm-cov',

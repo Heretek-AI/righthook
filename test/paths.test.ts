@@ -1,10 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-
-import { renderAll, joinRoot } from '../src/render.js';
-import { renderPresets } from '../src/scripts/emit-presets.js';
 import { detectLanguages } from '../src/detect.js';
 import type { ManifestOptions } from '../src/manifest.js';
+import { joinRoot, renderAll } from '../src/render.js';
+import { renderPresets } from '../src/scripts/emit-presets.js';
 import { makeFixture, packageJson } from './helpers.js';
 
 const OPTIONS: ManifestOptions = {
@@ -52,7 +51,10 @@ test('every repository gets the unconditional managed files', () => {
 
 test('files a repository cannot use are not written', () => {
   const goOnly = makeFixture({ 'go.mod': 'module x\n' });
-  const ruby = makeFixture({ Gemfile: "source 'x'\n", 'spec/a_spec.rb': 'x\n' });
+  const ruby = makeFixture({
+    Gemfile: "source 'x'\n",
+    'spec/a_spec.rb': 'x\n',
+  });
   try {
     const goFiles = render(goOnly.root);
     assert.ok(!goFiles.has('.righthook/simplecov.rb'), 'no Ruby, no SimpleCov');
@@ -81,7 +83,7 @@ test('every managed file is non-empty and newline-terminated', () => {
     'pyproject.toml': '[project]\nname = "x"\n',
     'go.mod': 'module x\n',
     'Cargo.toml': '[package]\nname = "x"\n',
-    'Gemfile': "source 'x'\n",
+    Gemfile: "source 'x'\n",
     'composer.json': '{}\n',
     'pom.xml': '<project/>\n',
   });
@@ -96,13 +98,22 @@ test('every managed file is non-empty and newline-terminated', () => {
 });
 
 test('the workflow file differs between vendored and caller modes', () => {
-  const fixture = makeFixture({ 'go.mod': 'module x\n', 'package.json': packageJson() });
+  const fixture = makeFixture({
+    'go.mod': 'module x\n',
+    'package.json': packageJson(),
+  });
   try {
     const vendored = render(fixture.root).get('.github/workflows/righthook.yml')!;
-    const caller = render(fixture.root, { ciMode: 'caller' }).get('.github/workflows/righthook.yml')!;
-    assert.match(vendored, /\n  lint-go:\n    name: lint \(go\)\n    runs-on: ubuntu-latest/, 'vendored mode inlines the jobs');
-    assert.match(vendored, /\n  lint-typescript:\n    name: lint \(typescript\)/);
-    assert.match(vendored, /\n  required:\n    name: required/);
+    const caller = render(fixture.root, { ciMode: 'caller' }).get(
+      '.github/workflows/righthook.yml',
+    )!;
+    assert.match(
+      vendored,
+      /\n {2}lint-go:\n {4}name: lint \(go\)\n {4}runs-on: ubuntu-latest/,
+      'vendored mode inlines the jobs',
+    );
+    assert.match(vendored, /\n {2}lint-typescript:\n {4}name: lint \(typescript\)/);
+    assert.match(vendored, /\n {2}required:\n {4}name: required/);
     assert.ok(!vendored.includes('fromJSON(inputs.languages)'), 'vendored mode has no input gates');
     assert.match(caller, /uses: acme\/righthook\/\.github\/workflows\/ci\.yml@v1/);
     assert.ok(!caller.includes('lint-go:'), 'caller mode delegates instead of inlining');
@@ -146,7 +157,7 @@ test('the shipped presets are valid lefthook documents with unique command keys'
         hook = hookMatch[1];
         continue;
       }
-      const commandMatch = /^    (\S+):$/.exec(line);
+      const commandMatch = /^ {4}(\S+):$/.exec(line);
       if (commandMatch && hook) keys.push(`${hook}.${commandMatch[1]}`);
     }
     assert.ok(keys.length > 20, `${rel} should carry the matrix`);

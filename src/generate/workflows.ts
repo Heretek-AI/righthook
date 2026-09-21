@@ -1,7 +1,7 @@
 import type { ToolSpec } from '../catalog/types.js';
 import type { DetectedLanguage } from '../detect.js';
-import { GENERATED_EXCLUDES } from './lefthook.js';
 import type { ManifestOptions } from '../manifest.js';
+import { GENERATED_EXCLUDES } from './lefthook.js';
 
 /**
  * GitHub Actions generation.
@@ -24,11 +24,31 @@ import type { ManifestOptions } from '../manifest.js';
 
 /** Pinned action references, resolved from the upstream repositories. */
 export const ACTIONS = {
-  checkout: { repo: 'actions/checkout', sha: '11d5960a326750d5838078e36cf38b85af677262', tag: 'v4' },
-  setupNode: { repo: 'actions/setup-node', sha: '49933ea5288caeca8642d1e84afbd3f7d6820020', tag: 'v4' },
-  setupPython: { repo: 'actions/setup-python', sha: 'a26af69be951a213d495a4c3e4e4022e16d87065', tag: 'v5' },
-  setupGo: { repo: 'actions/setup-go', sha: '40f1582b2485089dde7abd97c1529aa768e1baff', tag: 'v5' },
-  setupJava: { repo: 'actions/setup-java', sha: 'cf277c60eb25467037889841efdb72551f06f6c3', tag: 'v4' },
+  checkout: {
+    repo: 'actions/checkout',
+    sha: '11d5960a326750d5838078e36cf38b85af677262',
+    tag: 'v4',
+  },
+  setupNode: {
+    repo: 'actions/setup-node',
+    sha: '49933ea5288caeca8642d1e84afbd3f7d6820020',
+    tag: 'v4',
+  },
+  setupPython: {
+    repo: 'actions/setup-python',
+    sha: 'a26af69be951a213d495a4c3e4e4022e16d87065',
+    tag: 'v5',
+  },
+  setupGo: {
+    repo: 'actions/setup-go',
+    sha: '40f1582b2485089dde7abd97c1529aa768e1baff',
+    tag: 'v5',
+  },
+  setupJava: {
+    repo: 'actions/setup-java',
+    sha: 'cf277c60eb25467037889841efdb72551f06f6c3',
+    tag: 'v4',
+  },
   uploadArtifact: {
     repo: 'actions/upload-artifact',
     sha: 'ea165f8d65b6e75b540449e92b4886f43607fa02',
@@ -44,8 +64,16 @@ export const ACTIONS = {
     sha: '2031cfc080254a8a887f58cffee85186f0e49e48',
     tag: 'v4',
   },
-  codeql: { repo: 'github/codeql-action', sha: '3ea06614dafe36dec890db3446326e0d40ce53d4', tag: 'v3' },
-  setupRuby: { repo: 'ruby/setup-ruby', sha: 'a0102e0972be65f351c307e2d64b9314a57c8073', tag: 'v1' },
+  codeql: {
+    repo: 'github/codeql-action',
+    sha: '3ea06614dafe36dec890db3446326e0d40ce53d4',
+    tag: 'v3',
+  },
+  setupRuby: {
+    repo: 'ruby/setup-ruby',
+    sha: 'a0102e0972be65f351c307e2d64b9314a57c8073',
+    tag: 'v1',
+  },
   rustToolchain: {
     repo: 'dtolnay/rust-toolchain',
     sha: '6bed0761d98439e5a578e2877258200ad565ba87',
@@ -61,13 +89,21 @@ export const ACTIONS = {
     sha: '7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a',
     tag: 'v2',
   },
-  setupDart: { repo: 'dart-lang/setup-dart', sha: '6afc89df92d6eb3834022f73cd65adc8cdfcb92d', tag: 'v1' },
+  setupDart: {
+    repo: 'dart-lang/setup-dart',
+    sha: '6afc89df92d6eb3834022f73cd65adc8cdfcb92d',
+    tag: 'v1',
+  },
   setupBiome: {
     repo: 'biomejs/setup-biome',
     sha: '4c91541eaada48f67d7dbd7833600ce162b68f51',
     tag: 'v2',
   },
-  setupUv: { repo: 'astral-sh/setup-uv', sha: 'd4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86', tag: 'v5' },
+  setupUv: {
+    repo: 'astral-sh/setup-uv',
+    sha: 'd4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86',
+    tag: 'v5',
+  },
   golangciAction: {
     repo: 'golangci/golangci-lint-action',
     sha: '55c2c1448f86e01eaae002a5a3a9624417608d84',
@@ -158,8 +194,7 @@ type VersionExpr = (input: string) => string;
 const inputVersion: VersionExpr = (input) => `\${{ inputs.${input} }}`;
 
 /** Vendored form: versions come from the workflow-level `env:` block. */
-const envVersion: VersionExpr = (input) =>
-  `\${{ env.${input.replace(/-/g, '_').toUpperCase()} }}`;
+const envVersion: VersionExpr = (input) => `\${{ env.${input.replace(/-/g, '_').toUpperCase()} }}`;
 
 /** A YAML step, rendered as indented lines. */
 interface Step {
@@ -225,39 +260,42 @@ function setupSteps(
     : undefined;
   switch (language) {
     case 'typescript':
-      return ([
+      return [
         ...(variant === 'biome' ? [{ uses: actionRef('setupBiome') }] : []),
         { uses: actionRef('setupNode'), with: version ? [version] : [] },
-      ]);
+      ];
     case 'python':
-      return ([
+      return [
         { uses: actionRef('setupUv'), with: version ? [version] : [] },
         { uses: actionRef('setupPython'), with: version ? [version] : [] },
-      ]);
+      ];
     case 'go':
-      return ([
+      return [
         { uses: actionRef('setupGo'), with: version ? [version] : [] },
         { uses: actionRef('golangciAction'), with: [['version', 'latest']] },
-      ]);
+      ];
     case 'rust':
-      return ([
+      return [
         {
           uses: actionRef('rustToolchain'),
           with: [['components', 'rustfmt, clippy, llvm-tools-preview']],
         },
-      ]);
+      ];
     case 'ruby':
-      return ([
+      return [
         {
           uses: actionRef('setupRuby'),
           with: [...(version ? [version] : []), ['bundler-cache', 'false']],
         },
-      ]);
+      ];
     case 'java':
     case 'kotlin':
-      return ([
-        { uses: actionRef('setupJava'), with: [['distribution', 'temurin'], ...(version ? [version] : [])] },
-      ]);
+      return [
+        {
+          uses: actionRef('setupJava'),
+          with: [['distribution', 'temurin'], ...(version ? [version] : [])],
+        },
+      ];
     case 'dotnet':
       return [{ uses: actionRef('setupDotnet') }];
     case 'swift':
@@ -266,10 +304,12 @@ function setupSteps(
       return [{ uses: actionRef('setupDart') }];
     case 'cpp':
       return [
-        { run: ['sudo apt-get update', 'sudo apt-get install -y cppcheck gcovr clang-format'] },
+        {
+          run: ['sudo apt-get update', 'sudo apt-get install -y cppcheck gcovr clang-format'],
+        },
       ];
     case 'terraform':
-      return ([
+      return [
         {
           run: [
             'TERRAFORM_VERSION=1.9.8',
@@ -277,7 +317,7 @@ function setupSteps(
             'sudo unzip -o /tmp/terraform.zip -d /usr/local/bin',
           ],
         },
-      ]);
+      ];
     default:
       return [];
   }
@@ -384,9 +424,12 @@ function testJob(
   ];
   for (const command of entry.language.ciInstall ?? []) steps.push({ run: [command] });
   if (language === 'ruby') {
-    steps.push({ run: ['echo "RUBYOPT=-r./.righthook/simplecov.rb" >> "$GITHUB_ENV"'] });
+    steps.push({
+      run: ['echo "RUBYOPT=-r./.righthook/simplecov.rb" >> "$GITHUB_ENV"'],
+    });
   }
-  steps.push({ run: [...(producer.before ?? []), producer.ciArgv ?? producer.argv] });
+  const testCommand = producer.testArgv ?? producer.ciArgv ?? producer.argv;
+  steps.push({ run: [...(producer.before ?? []), testCommand] });
   if (producer.after?.length) steps.push({ run: producer.after });
 
   // Normalise before uploading: `coveragePath` may be a glob (coverlet), and
@@ -512,7 +555,9 @@ function workflowLintJob(): string[] {
     // `--pedantic` plus `--min-severity=low`: real findings fail the job, and
     // informational advisories do not.
     ...renderStep(
-      { run: ['pipx run zizmor --pedantic --min-severity=low .github/workflows'] },
+      {
+        run: ['pipx run zizmor --pedantic --min-severity=low .github/workflows'],
+      },
       '      ',
     ),
   ];
@@ -574,6 +619,10 @@ function coverageGateJob(
   diffCoverage: string,
 ): string[] {
   const withCoverage = detected.filter((entry) => coverageProducer(entry) !== undefined);
+  // Nothing produces a report, so there is no threshold to enforce. Emitting a
+  // gate here would fail on "no coverage data" and block every pull request for
+  // a gate that has nothing to measure.
+  if (withCoverage.length === 0) return [];
   const needs = withCoverage.map((entry) => `test-${entry.language.id}`);
   const reports = coverageReportArgs(detected);
   const lines: string[] = [
@@ -654,7 +703,7 @@ function requiredJob(needs: string[], alwaysRun: string[] = []): string[] {
         // The expression is passed through `env:` rather than interpolated into
         // the script, which is what zizmor's template-injection audit requires
         // even for a value assembled from job results.
-        env: [['JOB_RESULTS', '${{ join(needs.*.result, \' \') }}']],
+        env: [['JOB_RESULTS', "${{ join(needs.*.result, ' ') }}"]],
         run: [
           'for result in $JOB_RESULTS; do',
           '  case "$result" in',
@@ -702,6 +751,7 @@ export function renderVendored(
   version: string,
 ): string {
   const entries = ciEntries(detected);
+  const hasCoverage = detected.some((entry) => coverageProducer(entry) !== undefined);
   const needs = [
     ...entries.map(({ entry }) => `lint-${entry.language.id}`),
     ...entries
@@ -738,7 +788,12 @@ export function renderVendored(
     ...coverageGateJob(detected, String(options.coverageThreshold), String(options.diffCoverage)),
   );
   lines.push(
-    ...requiredJob(needs, ['security', 'workflow-lint', 'coverage-gate', 'deps-review']),
+    ...requiredJob(needs, [
+      'security',
+      'workflow-lint',
+      'deps-review',
+      ...(hasCoverage ? ['coverage-gate'] : []),
+    ]),
   );
 
   return `${lines.join('\n')}\n`;
@@ -761,10 +816,6 @@ export function renderReusable(detected: DetectedLanguage[], version: string): s
 
   const withCoverage = entries.filter(({ entry }) => coverageProducer(entry) !== undefined);
   const reports = coverageReportArgs(detected);
-  const needs = [
-    ...entries.map(({ entry }) => `lint-${entry.language.id}`),
-    ...withCoverage.map(({ entry }) => `test-${entry.language.id}`),
-  ];
 
   const lines: string[] = [
     `# Generated by righthook v${version}. Do not edit.`,
@@ -889,14 +940,19 @@ export function renderReusable(detected: DetectedLanguage[], version: string): s
       ],
     },
   ];
-  lines.push('  coverage-gate:');
-  lines.push('    name: coverage gate');
-  lines.push('    if: always()');
-  lines.push('    runs-on: ubuntu-latest');
-  lines.push(`    needs: [${withCoverage.map(({ entry }) => `test-${entry.language.id}`).join(', ')}]`);
-  lines.push('    steps:');
-  for (const step of gateSteps) lines.push(...renderStep(step, '      '));
-  void needs;
+  // Only emitted when some language actually produces a report; otherwise
+  // there is no threshold to enforce and the job would fail on "no data".
+  if (withCoverage.length > 0) {
+    lines.push('  coverage-gate:');
+    lines.push('    name: coverage gate');
+    lines.push('    if: always()');
+    lines.push('    runs-on: ubuntu-latest');
+    lines.push(
+      `    needs: [${withCoverage.map(({ entry }) => `test-${entry.language.id}`).join(', ')}]`,
+    );
+    lines.push('    steps:');
+    for (const step of gateSteps) lines.push(...renderStep(step, '      '));
+  }
 
   lines.push(
     ...requiredJob(
@@ -904,7 +960,9 @@ export function renderReusable(detected: DetectedLanguage[], version: string): s
         ...entries.map(({ entry }) => `lint-${entry.language.id}`),
         ...withCoverage.map(({ entry }) => `test-${entry.language.id}`),
       ],
-      ['security', 'workflow-lint', 'coverage-gate'],
+      withCoverage.length > 0
+        ? ['security', 'workflow-lint', 'coverage-gate']
+        : ['security', 'workflow-lint'],
     ),
   );
 
@@ -919,7 +977,9 @@ export function renderCaller(
   version: string,
 ): string {
   const gateScript =
-    options.root === '.' ? '.righthook/coverage_gate.py' : `${options.root}/.righthook/coverage_gate.py`;
+    options.root === '.'
+      ? '.righthook/coverage_gate.py'
+      : `${options.root}/.righthook/coverage_gate.py`;
   return [
     `# Generated by righthook v${version}. Do not edit.`,
     'name: righthook',

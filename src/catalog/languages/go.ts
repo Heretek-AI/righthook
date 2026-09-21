@@ -86,7 +86,11 @@ export const go: LanguageSpec = {
   ],
   conditionalTools: [
     {
-      when: [{ anyPath: ['golangci.yml', 'golangci.yaml', '.golangci.yml', '.golangci.yaml'] }],
+      when: [
+        {
+          anyPath: ['golangci.yml', 'golangci.yaml', '.golangci.yml', '.golangci.yaml'],
+        },
+      ],
       tool: {
         id: 'golangci-full',
         category: 'lint',

@@ -75,6 +75,12 @@ export interface ToolSpec {
   ciArgv?: string;
   /** `ciArgv` consumes a NUL-separated file list on stdin. */
   ciFiles?: boolean;
+  /**
+   * Overrides the command the CI `test-<lang>` job runs, leaving `argv`
+   * untouched. Used when the repository's own test entry point is the right
+   * thing to invoke in CI (`npm test`) rather than the bare runner.
+   */
+  testArgv?: string;
   /** Shell commands run before the CI run (e.g. `mkdir -p coverage`). */
   before?: string[];
   /** Shell commands run after the CI run (e.g. converting a Go profile). */

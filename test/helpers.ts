@@ -17,7 +17,10 @@ export interface Fixture {
 }
 
 /** Create a scratch directory with the given files (relative path -> content). */
-export function makeFixture(files: Record<string, string> = {}, options: { git?: boolean } = {}): Fixture {
+export function makeFixture(
+  files: Record<string, string> = {},
+  options: { git?: boolean } = {},
+): Fixture {
   const root = mkdtempSync(path.join(tmpdir(), 'righthook-test-'));
   const fixture: Fixture = {
     root,

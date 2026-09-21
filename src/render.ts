@@ -9,8 +9,8 @@ import {
   GITLEAKS_PLACEHOLDER,
   JSCPD_CONFIG,
   OSV_SCANNER_CONFIG,
-  YAMLLINT_CONFIG,
   renderDependabot,
+  YAMLLINT_CONFIG,
 } from './generate/aux.js';
 import { LOCAL_RIGHTHOOK_DIR, renderLefthook } from './generate/lefthook.js';
 import { COVERAGE_GATE_PY, MERGE_CONFLICTS_SH, RUN_SH, SIMPLECOV_RB } from './generate/runSh.js';
@@ -141,17 +141,24 @@ export function pinRemoteRef(ownerRepo: string, ref: string): PinnedRef {
   const [owner, name] = ownerRepo.split('/');
   if (!owner || !name) return { ref: `${ownerRepo}@${ref}`, pinned: false };
   try {
-    const out = execFileSync('git', ['ls-remote', `https://github.com/${owner}/${name}`, `refs/tags/${ref}`, ref], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-      timeout: 15_000,
-    });
+    const out = execFileSync(
+      'git',
+      ['ls-remote', `https://github.com/${owner}/${name}`, `refs/tags/${ref}`, ref],
+      {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        timeout: 15_000,
+      },
+    );
     const sha = out
       .split('\n')
       .map((line) => line.trim().split(/\s+/)[0])
       .find((candidate) => candidate && /^[0-9a-f]{40}$/.test(candidate));
     if (sha) {
-      return { ref: `${ownerRepo}/.github/workflows/ci.yml@${sha} # ${ref}`, pinned: true };
+      return {
+        ref: `${ownerRepo}/.github/workflows/ci.yml@${sha} # ${ref}`,
+        pinned: true,
+      };
     }
   } catch {
     // Offline, or the repository is not published yet.

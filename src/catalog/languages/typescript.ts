@@ -43,7 +43,8 @@ export const typescript: LanguageSpec = {
           category: 'format',
           hook: 'pre-commit',
           argv: 'prettier --write --ignore-unknown {staged_files}',
-          ciArgv: "xargs -0 -r prettier --check", ciFiles: true,
+          ciArgv: 'xargs -0 -r prettier --check',
+          ciFiles: true,
           priority: 1,
           stageFixed: true,
           install: {
@@ -66,7 +67,8 @@ export const typescript: LanguageSpec = {
           category: 'lint',
           hook: 'pre-push',
           argv: 'eslint --max-warnings=0 .',
-          ciArgv: "xargs -0 -r eslint --max-warnings=0", ciFiles: true,
+          ciArgv: 'xargs -0 -r eslint --max-warnings=0',
+          ciFiles: true,
           priority: 6,
           install: { npm: 'npm install -D eslint', url: 'https://eslint.org' },
         },
@@ -106,7 +108,8 @@ export const typescript: LanguageSpec = {
           category: 'lint',
           hook: 'pre-push',
           argv: 'biome check --error-on-warnings .',
-          ciArgv: "xargs -0 -r biome ci --error-on-warnings", ciFiles: true,
+          ciArgv: 'xargs -0 -r biome ci --error-on-warnings',
+          ciFiles: true,
           priority: 6,
           install: {
             npm: 'npm install -D @biomejs/biome',
@@ -127,7 +130,10 @@ export const typescript: LanguageSpec = {
         argv: 'tsc --noEmit',
         ciArgv: 'tsc --noEmit',
         priority: 4,
-        install: { npm: 'npm install -D typescript', url: 'https://www.typescriptlang.org' },
+        install: {
+          npm: 'npm install -D typescript',
+          url: 'https://www.typescriptlang.org',
+        },
       },
     },
     {
@@ -178,7 +184,10 @@ export const typescript: LanguageSpec = {
         argv: 'yarn npm audit --severity high',
         ciArgv: 'yarn npm audit --severity high',
         priority: 1,
-        install: { npm: 'shipped with yarn', url: 'https://yarnpkg.com/cli/npm/audit' },
+        install: {
+          npm: 'shipped with yarn',
+          url: 'https://yarnpkg.com/cli/npm/audit',
+        },
       },
     },
     {
@@ -190,7 +199,10 @@ export const typescript: LanguageSpec = {
         argv: 'bun audit',
         ciArgv: 'bun audit',
         priority: 1,
-        install: { npm: 'shipped with bun', url: 'https://bun.sh/docs/cli/audit' },
+        install: {
+          npm: 'shipped with bun',
+          url: 'https://bun.sh/docs/cli/audit',
+        },
       },
     },
     {
@@ -204,7 +216,10 @@ export const typescript: LanguageSpec = {
         priority: 2,
         coverageArtifact: 'lcov',
         coveragePath: 'coverage/lcov.info',
-        install: { npm: 'npm install -D vitest @vitest/coverage-v8', url: 'https://vitest.dev' },
+        install: {
+          npm: 'npm install -D vitest @vitest/coverage-v8',
+          url: 'https://vitest.dev',
+        },
       },
     },
     {
@@ -222,17 +237,45 @@ export const typescript: LanguageSpec = {
       },
     },
     {
-      when: [{ noDep: { file: 'package.json', names: ['vitest', 'jest'] } }],
+      // A repository that defines its own `test` script knows better than a
+      // bare runner invocation, so that script is what hooks and CI run.
+      when: [
+        {
+          dep: { file: 'package.json', names: ['test'] },
+          noDep: { file: 'package.json', names: ['vitest', 'jest'] },
+        },
+      ],
+      tool: {
+        id: 'npm-test',
+        category: 'test',
+        hook: 'pre-push',
+        argv: 'npm test',
+        ciArgv: 'npm test',
+        testArgv: 'npm test',
+        priority: 2,
+        install: {
+          npm: 'shipped with npm',
+          url: 'https://docs.npmjs.com/cli/commands/npm-test',
+        },
+      },
+    },
+    {
+      // Last resort: no configured runner and no test script of its own.
+      when: [{ noDep: { file: 'package.json', names: ['vitest', 'jest', 'test'] } }],
       tool: {
         id: 'node-test',
         category: 'test',
         hook: 'pre-push',
         argv: 'node --test',
-        ciArgv: 'node --test --experimental-test-coverage',
+        ciArgv: 'node --test',
         priority: 2,
         // Node's own coverage reporter has no Cobertura/lcov output, so the
-        // gate reports this language as SKIP rather than a silent pass.
-        install: { npm: 'shipped with Node.js', url: 'https://nodejs.org/api/test.html' },
+        // gate reports this language as SKIP rather than a silent pass — and
+        // with no other producer the gate job is omitted entirely.
+        install: {
+          npm: 'shipped with Node.js',
+          url: 'https://nodejs.org/api/test.html',
+        },
       },
     },
   ],

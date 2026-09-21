@@ -26,9 +26,11 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && node dist/scripts/emit-presets.js",
+    "lint": "biome ci src test bin",
+    "format": "biome check --write src test bin",
     "prepare": "npm run build",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/test/*.test.js",
-    "check": "npm run build && npm run test",
+    "check": "npm run build && npm run lint && npm run test",
     "presets": "node dist/scripts/emit-presets.js"
   },
   "dependencies": {
@@ -36,6 +38,7 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.14",
     "@types/node": "^22.10.2",
     "@types/prompts": "^2.4.9",
     "typescript": "^5.7.2"
@@ -50,6 +53,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BillyOutlast/righthook.git"
-  }
+    "url": "git+https://github.com/Heretek-AI/righthook.git"
+  },
+  "homepage": "https://github.com/Heretek-AI/righthook",
+  "bugs": {
+    "url": "https://github.com/Heretek-AI/righthook/issues"
+  },
+  "packageManager": "npm@11.15.0"
 }

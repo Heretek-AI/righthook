@@ -1,0 +1,39 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "files": {
+    "includes": ["src/**/*.ts", "test/**/*.ts", "bin/**/*.js"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "all",
+      "arrowParentheses": "always",
+      "bracketSpacing": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        // The CLI writes to stdout and stderr on purpose.
+        "noConsole": "off",
+        // This package's output *is* GitHub Actions expressions and shell
+        // parameter expansions in string literals, not JS interpolation.
+        "noTemplateCurlyInString": "off"
+      },
+      "style": {
+        // `noUncheckedIndexedAccess` is enabled, so `!` is the intended escape
+        // for an access the code has already bounds-checked.
+        "noNonNullAssertion": "off"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+# Local overrides for the righthook repository itself.
+#
+# `lefthook.yml` is generated (see README); this file is righthook's
+# highest-precedence override and is never rewritten by `righthook sync`.
+pre-push:
+  commands:
+    typecheck:
+      priority: 20
+      run: npm run build
+    lint:
+      priority: 21
+      run: npm run lint

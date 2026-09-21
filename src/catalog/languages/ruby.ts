@@ -52,7 +52,10 @@ export const ruby: LanguageSpec = {
         argv: 'brakeman -q --no-pager',
         ciArgv: 'brakeman -q --no-pager',
         priority: 2,
-        install: { brew: 'brew install brakeman', url: 'https://brakemanscanner.org' },
+        install: {
+          brew: 'brew install brakeman',
+          url: 'https://brakemanscanner.org',
+        },
       },
     },
     {
@@ -86,7 +89,12 @@ export const ruby: LanguageSpec = {
       },
     },
     {
-      when: [{ anyPath: ['test/**/*.rb', 'test'], nonePath: ['spec/**/*.rb', 'spec'] }],
+      when: [
+        {
+          anyPath: ['test/**/*.rb', 'test'],
+          nonePath: ['spec/**/*.rb', 'spec'],
+        },
+      ],
       tool: {
         id: 'rake-test',
         category: 'test',
@@ -101,6 +109,9 @@ export const ruby: LanguageSpec = {
 };
 
 /** Extra env a CI coverage run for Ruby needs (see `.righthook/simplecov.rb`). */
-export const rubyCoverageEnv = { RUBYOPT: '-r./.righthook/simplecov.rb', COVERAGE: '1' };
+export const rubyCoverageEnv = {
+  RUBYOPT: '-r./.righthook/simplecov.rb',
+  COVERAGE: '1',
+};
 
 export const rubyTools = (): ToolSpec[] => ruby.tools;

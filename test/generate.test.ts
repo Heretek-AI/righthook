@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { detectLanguages } from '../src/detect.js';
+import type { EmittedCommand } from '../src/generate/lefthook.js';
 import { collectCommands, renderLefthook } from '../src/generate/lefthook.js';
 import { makeFixture, packageJson } from './helpers.js';
 
@@ -21,8 +22,8 @@ test('commands are ordered by hook, then priority, then id', () => {
     assert.ok(lastCommit === -1 || lastCommit >= hooks.lastIndexOf('pre-push'), 'commit-msg last');
 
     for (let i = 1; i < commands.length; i += 1) {
-      const previous = commands[i - 1]!;
-      const current = commands[i]!;
+      const previous = commands[i - 1] as EmittedCommand;
+      const current = commands[i] as EmittedCommand;
       if (previous.tool.hook !== current.tool.hook) continue;
       assert.ok(
         previous.tool.priority <= current.tool.priority,
@@ -44,8 +45,8 @@ test('formatters run before linters inside pre-commit', () => {
     const golangci = preCommit.findIndex((command) => command.id === 'golangci');
     assert.ok(gofmt >= 0 && golangci >= 0);
     assert.ok(gofmt < golangci, `gofmt (${gofmt}) must precede golangci (${golangci})`);
-    assert.equal(preCommit[gofmt]!.tool.priority, 1);
-    assert.equal(preCommit[golangci]!.tool.priority, 2);
+    assert.equal((preCommit[gofmt] as EmittedCommand).tool.priority, 1);
+    assert.equal((preCommit[golangci] as EmittedCommand).tool.priority, 2);
   } finally {
     fixture.cleanup();
   }
@@ -64,12 +65,14 @@ test('glob is emitted only for commands that take a file placeholder', () => {
     const commands = collectCommands(detected);
 
     const wholeRepo = commands.filter(
-      (command) => !command.tool.argv.includes('{staged_files}') && !command.tool.argv.includes('{push_files}'),
+      (command) =>
+        !command.tool.argv.includes('{staged_files}') &&
+        !command.tool.argv.includes('{push_files}'),
     );
     assert.ok(wholeRepo.length > 0, 'fixture must have whole-repo tools');
     for (const command of wholeRepo) {
       const lines = yaml.split('\n');
-      const start = lines.findIndex((line) => line === `    ${command.id}:`);
+      const start = lines.indexOf(`    ${command.id}:`);
       assert.ok(start >= 0, `${command.id} is missing from the YAML`);
       // A command's body is every following line indented deeper than its key.
       const body: string[] = [];
@@ -101,7 +104,11 @@ test('a file-based tool inherits its language glob instead of seeing every stage
 
     // A universal tool keeps its own explicit glob (or none at all).
     const editorconfig = commands.find((command) => command.id === 'editorconfig')!;
-    assert.equal(editorconfig.glob, undefined, 'editorconfig-checker legitimately checks any text file');
+    assert.equal(
+      editorconfig.glob,
+      undefined,
+      'editorconfig-checker legitimately checks any text file',
+    );
   } finally {
     fixture.cleanup();
   }
@@ -134,9 +141,9 @@ test('the generated document declares the required top-level settings', () => {
     assert.match(yaml, /^assert_lefthook_installed: true$/m);
     assert.match(yaml, /^skip_lfs: false$/m);
     assert.match(yaml, /^glob_matcher: gobwas$/m);
-    assert.match(yaml, /^pre-commit:\n  parallel: false\n  commands:$/m);
-    assert.match(yaml, /^pre-push:\n  parallel: false\n  commands:$/m);
-    assert.match(yaml, /^commit-msg:\n  parallel: false\n  commands:$/m);
+    assert.match(yaml, /^pre-commit:\n {2}parallel: false\n {2}commands:$/m);
+    assert.match(yaml, /^pre-push:\n {2}parallel: false\n {2}commands:$/m);
+    assert.match(yaml, /^commit-msg:\n {2}parallel: false\n {2}commands:$/m);
     assert.ok(!yaml.includes('extends:'), 'the file must be self-contained');
   } finally {
     fixture.cleanup();
@@ -144,10 +151,15 @@ test('the generated document declares the required top-level settings', () => {
 });
 
 test('every run line goes through the launcher, and stage_fixed is pre-commit only', () => {
-  const fixture = makeFixture({ 'go.mod': 'module x\n', 'package.json': packageJson() });
+  const fixture = makeFixture({
+    'go.mod': 'module x\n',
+    'package.json': packageJson(),
+  });
   try {
     const yaml = renderLefthook(detectLanguages(fixture.root).languages, OPTIONS);
-    for (const line of yaml.split('\n').filter((candidate) => candidate.trimStart().startsWith('run: '))) {
+    for (const line of yaml
+      .split('\n')
+      .filter((candidate) => candidate.trimStart().startsWith('run: '))) {
       assert.match(line, /run: "?sh \.righthook\/run\.sh /, `not launched: ${line}`);
     }
     // `stage_fixed` only makes sense while files are staged.
@@ -197,8 +209,8 @@ test('a --root install pins root on every command and reaches .righthook relativ
     for (const line of runLines) {
       assert.match(line, /run: "?sh \.righthook\/run\.sh /, `subdir run line: ${line}`);
     }
-    const roots = yaml.match(/^      root: services\/api$/gm) ?? [];
-    assert.equal(roots.length, yaml.match(/^    \S+:$/gm)!.length, 'every command declares root');
+    const roots = yaml.match(/^ {6}root: services\/api$/gm) ?? [];
+    assert.equal(roots.length, yaml.match(/^ {4}\S+:$/gm)!.length, 'every command declares root');
   } finally {
     fixture.cleanup();
   }
@@ -210,11 +222,12 @@ test('ciOnly tools are absent from lefthook.yml but present in CI inputs', () =>
     const detectedResult = detectLanguages(fixture.root);
     const detected = detectedResult.languages;
     const yaml = renderLefthook(detected, OPTIONS);
-    assert.ok(!yaml.includes('cargo-llvm-cov'), 'coverage-only tools need an index, so they stay out of hooks');
     assert.ok(
-      detected
-        .flatMap((entry) => entry.tools)
-        .some((tool) => tool.id === 'cargo-llvm-cov'),
+      !yaml.includes('cargo-llvm-cov'),
+      'coverage-only tools need an index, so they stay out of hooks',
+    );
+    assert.ok(
+      detected.flatMap((entry) => entry.tools).some((tool) => tool.id === 'cargo-llvm-cov'),
       'the resolved tool list still carries it for CI',
     );
   } finally {

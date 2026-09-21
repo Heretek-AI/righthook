@@ -59,7 +59,7 @@ export const report = {
   localOverrideNote(): string {
     return c.dim(
       '  lefthook.yml is wholly owned by righthook; put local tweaks in lefthook-local.yml' +
-        ' (lefthook\'s highest-precedence override file).',
+        " (lefthook's highest-precedence override file).",
     );
   },
 

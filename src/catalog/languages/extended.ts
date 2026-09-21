@@ -80,11 +80,17 @@ export const clojure: LanguageSpec = {
     tool('cljstyle', 'format', 'pre-commit', 'cljstyle fix --report', 1, {
       ciArgv: 'cljstyle check',
       stageFixed: true,
-      install: { brew: 'brew install cljstyle', url: 'https://github.com/greglook/cljstyle' },
+      install: {
+        brew: 'brew install cljstyle',
+        url: 'https://github.com/greglook/cljstyle',
+      },
     }),
     tool('clj-kondo', 'lint', 'pre-commit', 'clj-kondo --lint src test', 2, {
       ciArgv: 'clj-kondo --lint src test',
-      install: { brew: 'brew install clj-kondo', url: 'https://github.com/clj-kondo/clj-kondo' },
+      install: {
+        brew: 'brew install clj-kondo',
+        url: 'https://github.com/clj-kondo/clj-kondo',
+      },
     }),
   ],
 };
@@ -99,11 +105,17 @@ export const haskell: LanguageSpec = {
     tool('fourmolu', 'format', 'pre-commit', 'fourmolu -i {staged_files}', 1, {
       ciArgv: 'fourmolu --mode check .',
       stageFixed: true,
-      install: { brew: 'brew install fourmolu', url: 'https://github.com/fourmolu/fourmolu' },
+      install: {
+        brew: 'brew install fourmolu',
+        url: 'https://github.com/fourmolu/fourmolu',
+      },
     }),
     tool('hlint', 'lint', 'pre-commit', 'hlint .', 2, {
       ciArgv: 'hlint .',
-      install: { brew: 'brew install hlint', url: 'https://github.com/ndmitchell/hlint' },
+      install: {
+        brew: 'brew install hlint',
+        url: 'https://github.com/ndmitchell/hlint',
+      },
     }),
     tool('cabal-test', 'test', 'pre-push', 'cabal test', 2, {
       ciArgv: 'cabal test',
@@ -122,11 +134,18 @@ export const lua: LanguageSpec = {
     tool('stylua', 'format', 'pre-commit', 'stylua {staged_files}', 1, {
       ciArgv: 'stylua --check .',
       stageFixed: true,
-      install: { cargo: 'cargo install stylua', brew: 'brew install stylua', url: 'https://github.com/JohnnyMorganz/StyLua' },
+      install: {
+        cargo: 'cargo install stylua',
+        brew: 'brew install stylua',
+        url: 'https://github.com/JohnnyMorganz/StyLua',
+      },
     }),
     tool('luacheck', 'lint', 'pre-commit', 'luacheck {staged_files}', 2, {
       ciArgv: 'luacheck .',
-      install: { brew: 'brew install luacheck', url: 'https://github.com/lunarmodules/luacheck' },
+      install: {
+        brew: 'brew install luacheck',
+        url: 'https://github.com/lunarmodules/luacheck',
+      },
     }),
   ],
 };
@@ -140,7 +159,10 @@ export const perl: LanguageSpec = {
   tools: [
     tool('perlcritic', 'lint', 'pre-commit', 'perlcritic --severity 3 {staged_files}', 2, {
       ciArgv: 'perlcritic --severity 3 .',
-      install: { brew: 'brew install perlcritic', url: 'https://github.com/Perl-Critic/Perl-Critic' },
+      install: {
+        brew: 'brew install perlcritic',
+        url: 'https://github.com/Perl-Critic/Perl-Critic',
+      },
     }),
     tool('prove', 'test', 'pre-push', 'prove -lr t', 2, {
       ciArgv: 'prove -lr t',
@@ -165,8 +187,8 @@ export const r: LanguageSpec = {
       ciArgv: 'Rscript -e \'lintr::lint_dir("R")\'',
       install: { url: 'https://lintr.r-lib.org' },
     }),
-    tool('testthat', 'test', 'pre-push', 'Rscript -e \'testthat::test_local()\'', 2, {
-      ciArgv: 'Rscript -e \'testthat::test_local()\'',
+    tool('testthat', 'test', 'pre-push', "Rscript -e 'testthat::test_local()'", 2, {
+      ciArgv: "Rscript -e 'testthat::test_local()'",
       install: { url: 'https://testthat.r-lib.org' },
     }),
   ],
@@ -182,15 +204,24 @@ export const nix: LanguageSpec = {
     tool('nixfmt', 'format', 'pre-commit', 'nixfmt {staged_files}', 1, {
       ciArgv: 'nixfmt --check .',
       stageFixed: true,
-      install: { brew: 'brew install nixfmt', url: 'https://github.com/NixOS/nixfmt' },
+      install: {
+        brew: 'brew install nixfmt',
+        url: 'https://github.com/NixOS/nixfmt',
+      },
     }),
     tool('statix', 'lint', 'pre-commit', 'statix check', 2, {
       ciArgv: 'statix check',
-      install: { brew: 'brew install statix', url: 'https://github.com/oppiliappan/statix' },
+      install: {
+        brew: 'brew install statix',
+        url: 'https://github.com/oppiliappan/statix',
+      },
     }),
     tool('deadnix', 'deadcode', 'pre-push', 'deadnix --fail', 3, {
       ciArgv: 'deadnix --fail',
-      install: { brew: 'brew install deadnix', url: 'https://github.com/astro/deadnix' },
+      install: {
+        brew: 'brew install deadnix',
+        url: 'https://github.com/astro/deadnix',
+      },
     }),
   ],
 };
@@ -221,14 +252,28 @@ export const sql: LanguageSpec = {
   fileGlob: '*.sql',
   ciSetup: ['python'],
   tools: [
-    tool('sqlfluff-fix', 'format', 'pre-commit', 'sqlfluff fix --disable-progress-bar {staged_files}', 1, {
-      ciArgv: 'sqlfluff lint --disable-progress-bar .',
-      stageFixed: true,
-      install: { uv: 'uv tool install sqlfluff', brew: 'brew install sqlfluff', url: 'https://sqlfluff.com' },
-    }),
+    tool(
+      'sqlfluff-fix',
+      'format',
+      'pre-commit',
+      'sqlfluff fix --disable-progress-bar {staged_files}',
+      1,
+      {
+        ciArgv: 'sqlfluff lint --disable-progress-bar .',
+        stageFixed: true,
+        install: {
+          uv: 'uv tool install sqlfluff',
+          brew: 'brew install sqlfluff',
+          url: 'https://sqlfluff.com',
+        },
+      },
+    ),
     tool('sqlfluff', 'lint', 'pre-push', 'sqlfluff lint --disable-progress-bar .', 6, {
       ciArgv: 'sqlfluff lint --disable-progress-bar .',
-      install: { uv: 'uv tool install sqlfluff', url: 'https://sqlfluff.com' },
+      install: {
+        uv: 'uv tool install sqlfluff',
+        url: 'https://sqlfluff.com',
+      },
     }),
   ],
 };
@@ -243,11 +288,17 @@ export const protobuf: LanguageSpec = {
     tool('buf-format', 'format', 'pre-commit', 'buf format -w', 1, {
       ciArgv: 'buf format --diff --exit-code',
       stageFixed: true,
-      install: { brew: 'brew install bufbuild/buf/buf', url: 'https://buf.build' },
+      install: {
+        brew: 'brew install bufbuild/buf/buf',
+        url: 'https://buf.build',
+      },
     }),
     tool('buf-lint', 'lint', 'pre-commit', 'buf lint', 2, {
       ciArgv: 'buf lint',
-      install: { brew: 'brew install bufbuild/buf/buf', url: 'https://buf.build' },
+      install: {
+        brew: 'brew install bufbuild/buf/buf',
+        url: 'https://buf.build',
+      },
     }),
   ],
 };
@@ -261,7 +312,10 @@ export const openapi: LanguageSpec = {
   tools: [
     tool('spectral', 'lint', 'pre-commit', 'spectral lint --fail-severity=warn', 2, {
       ciArgv: 'spectral lint --fail-severity=warn',
-      install: { npm: 'npm install -D @stoplight/spectral-cli', url: 'https://github.com/stoplightio/spectral' },
+      install: {
+        npm: 'npm install -D @stoplight/spectral-cli',
+        url: 'https://github.com/stoplightio/spectral',
+      },
     }),
   ],
 };
@@ -275,7 +329,11 @@ export const ansible: LanguageSpec = {
   tools: [
     tool('ansible-lint', 'lint', 'pre-push', 'ansible-lint', 6, {
       ciArgv: 'ansible-lint',
-      install: { uv: 'uv tool install ansible-lint', brew: 'brew install ansible-lint', url: 'https://ansible.readthedocs.io/projects/lint' },
+      install: {
+        uv: 'uv tool install ansible-lint',
+        brew: 'brew install ansible-lint',
+        url: 'https://ansible.readthedocs.io/projects/lint',
+      },
     }),
   ],
 };
@@ -287,10 +345,21 @@ export const kubernetes: LanguageSpec = {
   fileGlob: '*.{yml,yaml}',
   ciSetup: ['go'],
   tools: [
-    tool('kubeconform', 'lint', 'pre-push', 'kubeconform -strict -summary -ignore-missing-schemas', 6, {
-      ciArgv: 'kubeconform -strict -summary -ignore-missing-schemas',
-      install: { brew: 'brew install kubeconform', go: 'go install github.com/yannh/kubeconform/cmd/kubeconform@latest', url: 'https://github.com/yannh/kubeconform' },
-    }),
+    tool(
+      'kubeconform',
+      'lint',
+      'pre-push',
+      'kubeconform -strict -summary -ignore-missing-schemas',
+      6,
+      {
+        ciArgv: 'kubeconform -strict -summary -ignore-missing-schemas',
+        install: {
+          brew: 'brew install kubeconform',
+          go: 'go install github.com/yannh/kubeconform/cmd/kubeconform@latest',
+          url: 'https://github.com/yannh/kubeconform',
+        },
+      },
+    ),
   ],
 };
 

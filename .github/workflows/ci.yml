@@ -72,7 +72,8 @@ jobs:
           pnpm audit --audit-level high
           yarn npm audit --severity high
           jest --coverage
-          node --test --experimental-test-coverage
+          node --test
+          npm test
           vitest run --coverage
           knip --no-progress
           tsc --noEmit

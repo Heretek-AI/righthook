@@ -1,32 +1,30 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-
-import { detectLanguages, parseLanguageList } from './detect.js';
-import { LANGUAGES, knownLanguageIds } from './catalog/index.js';
+import { knownLanguageIds, LANGUAGES } from './catalog/index.js';
 import type { InstallHints, ToolSpec } from './catalog/types.js';
-import { generate as generatePresets } from './scripts/emit-presets.js';
+import { detectLanguages, parseLanguageList } from './detect.js';
 import {
   checkDrift,
   hashContent,
-  readManifest,
-  serializeManifest,
-  writeFileAtomic,
   MANIFEST_PATH,
   type Manifest,
   type ManifestOptions,
+  readManifest,
+  serializeManifest,
+  writeFileAtomic,
 } from './manifest.js';
 import {
-  GITHUB_PATHS,
-  MANAGED_PATHS,
   gitRoot,
   joinRoot,
+  MANAGED_PATHS,
   packageVersion,
   pinRemoteRef,
-  renderAll,
   type RenderedFiles,
+  renderAll,
 } from './render.js';
 import { report } from './report.js';
+import { generate as generatePresets } from './scripts/emit-presets.js';
 
 /**
  * The `righthook` command line.
@@ -92,7 +90,11 @@ const DEFAULTS: CliOptions = {
 };
 
 /** Parse one numeric flag, recording a friendly error on malformed input. */
-function parseNumber(value: string | undefined, flag: string, errors: string[]): number | undefined {
+function parseNumber(
+  value: string | undefined,
+  flag: string,
+  errors: string[],
+): number | undefined {
   if (value === undefined) {
     errors.push(`${flag} requires a value`);
     return undefined;
@@ -239,9 +241,17 @@ export function planWrites(
     if (existing === undefined || existing === newHash || always.has(rel) || force) {
       plan.push({ path: rel, action: existing === newHash ? 'keep' : 'write' });
     } else if (expected === undefined) {
-      plan.push({ path: rel, action: 'skip-unmanaged', reason: 'exists, not managed by righthook' });
+      plan.push({
+        path: rel,
+        action: 'skip-unmanaged',
+        reason: 'exists, not managed by righthook',
+      });
     } else {
-      plan.push({ path: rel, action: 'skip-modified', reason: 'modified locally' });
+      plan.push({
+        path: rel,
+        action: 'skip-modified',
+        reason: 'modified locally',
+      });
     }
   }
   return plan;
@@ -280,16 +290,12 @@ async function runInit(cli: CliOptions, cwd: string, mode: 'init' | 'sync'): Pro
   const existingManifest = readManifest(root);
   // The caller mode must reference a pinned commit, so the release tag is
   // resolved against the published repository rather than emitted verbatim.
-  const pinned = pinRemoteRef('BillyOutlast/righthook', 'v1');
+  const pinned = pinRemoteRef('Heretek-AI/righthook', 'v1');
 
   // `init` into a repository that already has a hand-written lefthook.yml is
   // refused, because the write would silently discard it.
   const lefthookRel = joinRoot(relRoot === '' ? '.' : relRoot, MANAGED_PATHS.lefthook);
-  if (
-    existingManifest === undefined &&
-    !cli.force &&
-    fileExistsAt(path.join(root, lefthookRel))
-  ) {
+  if (existingManifest === undefined && !cli.force && fileExistsAt(path.join(root, lefthookRel))) {
     process.stderr.write(`${report.alreadyExists(lefthookRel)}\n`);
     return 1;
   }
@@ -306,9 +312,7 @@ async function runInit(cli: CliOptions, cwd: string, mode: 'init' | 'sync'): Pro
 
   const plan = planWrites(root, files, existingManifest, cli.force, [lefthookRel]);
   process.stdout.write(`${report.banner(version)}\n`);
-  process.stdout.write(
-    `${report.detected(detected.map((entry) => entry.language.id))}\n`,
-  );
+  process.stdout.write(`${report.detected(detected.map((entry) => entry.language.id))}\n`);
   if (existingManifest && mode === 'sync') {
     const drift = checkDrift(root, existingManifest);
     const drifted = drift.filter((entry) => entry.state !== 'ok');
@@ -319,8 +323,10 @@ async function runInit(cli: CliOptions, cwd: string, mode: 'init' | 'sync'): Pro
   let refused = 0;
   for (const decision of plan) {
     if (cli.dryRun) {
-      if (decision.action === 'write') process.stdout.write(`${report.wouldWrite(decision.path)}\n`);
-      else if (decision.action === 'keep') process.stdout.write(`${report.keeping(decision.path)}\n`);
+      if (decision.action === 'write')
+        process.stdout.write(`${report.wouldWrite(decision.path)}\n`);
+      else if (decision.action === 'keep')
+        process.stdout.write(`${report.keeping(decision.path)}\n`);
       else process.stdout.write(`${report.wouldSkip(decision.path, decision.reason ?? '')}\n`);
       continue;
     }
@@ -362,9 +368,7 @@ async function runInit(cli: CliOptions, cwd: string, mode: 'init' | 'sync'): Pro
   };
   process.stdout.write('');
   writeFileAtomic(path.join(root, MANIFEST_PATH), serializeManifest(manifest));
-  process.stdout.write(
-    `${report.manifestWritten(MANIFEST_PATH, Object.keys(written).length)}\n`,
-  );
+  process.stdout.write(`${report.manifestWritten(MANIFEST_PATH, Object.keys(written).length)}\n`);
   process.stdout.write(`${report.localOverrideNote()}\n`);
 
   // lefthook only discovers its config at the git root, so a `--root <subdir>`
@@ -388,9 +392,7 @@ async function runInit(cli: CliOptions, cwd: string, mode: 'init' | 'sync'): Pro
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
-      env: needsConfigEnv
-        ? { ...process.env, LEFTHOOK_CONFIG: configRel }
-        : process.env,
+      env: needsConfigEnv ? { ...process.env, LEFTHOOK_CONFIG: configRel } : process.env,
     });
     if (result.status === 0) {
       process.stdout.write(`${report.installOk()}\n`);
@@ -449,8 +451,15 @@ function runDoctor(cli: CliOptions, cwd: string): number {
   });
   const detected = detectedResult.languages;
 
-  const universalTools = new Map(detected.flatMap((entry) => entry.tools).map((tool) => [tool.id, tool]));
-  const rows: { id: string; language: string; installed: boolean; install: string }[] = [];
+  const universalTools = new Map(
+    detected.flatMap((entry) => entry.tools).map((tool) => [tool.id, tool]),
+  );
+  const rows: {
+    id: string;
+    language: string;
+    installed: boolean;
+    install: string;
+  }[] = [];
 
   for (const entry of detected) {
     const tools: ToolSpec[] = [...entry.tools];

@@ -5,7 +5,8 @@ const ruffFormat: ToolSpec = {
   category: 'format',
   hook: 'pre-commit',
   argv: 'ruff format {staged_files}',
-  ciArgv: "xargs -0 -r ruff format --check", ciFiles: true,
+  ciArgv: 'xargs -0 -r ruff format --check',
+  ciFiles: true,
   priority: 1,
   stageFixed: true,
   install: {
@@ -21,7 +22,8 @@ const ruffCheck: ToolSpec = {
   category: 'lint',
   hook: 'pre-commit',
   argv: 'ruff check --fix --force-exclude {staged_files}',
-  ciArgv: "xargs -0 -r ruff check --force-exclude", ciFiles: true,
+  ciArgv: 'xargs -0 -r ruff check --force-exclude',
+  ciFiles: true,
   priority: 2,
   stageFixed: true,
   install: {
@@ -36,7 +38,8 @@ const vulture: ToolSpec = {
   category: 'deadcode',
   hook: 'pre-push',
   argv: 'vulture --min-confidence 80 .',
-  ciArgv: "xargs -0 -r vulture --min-confidence 80", ciFiles: true,
+  ciArgv: 'xargs -0 -r vulture --min-confidence 80',
+  ciFiles: true,
   priority: 3,
   install: {
     uv: 'uv tool install vulture',
@@ -102,7 +105,9 @@ export const python: LanguageSpec = {
   fileGlob: '*.py',
   ciSetup: ['python', 'uv'],
   dependabot: ['pip'],
-  ciInstall: ['pip install -e ".[dev]" || pip install -e . || pip install -r requirements.txt || true'],
+  ciInstall: [
+    'pip install -e ".[dev]" || pip install -e . || pip install -r requirements.txt || true',
+  ],
   tools: [ruffFormat, ruffCheck, vulture, bandit, pipAudit, pytest],
   variants: [
     {
@@ -124,7 +129,8 @@ export const python: LanguageSpec = {
           category: 'typecheck',
           hook: 'pre-push',
           argv: 'pyright .',
-          ciArgv: "xargs -0 -r pyright", ciFiles: true,
+          ciArgv: 'xargs -0 -r pyright',
+          ciFiles: true,
           priority: 5,
           install: {
             uv: 'uv tool install pyright',
@@ -149,7 +155,8 @@ export const python: LanguageSpec = {
           category: 'typecheck',
           hook: 'pre-push',
           argv: 'mypy --install-types --non-interactive .',
-          ciArgv: "xargs -0 -r mypy --install-types --non-interactive", ciFiles: true,
+          ciArgv: 'xargs -0 -r mypy --install-types --non-interactive',
+          ciFiles: true,
           priority: 5,
           install: {
             uv: 'uv tool install mypy',

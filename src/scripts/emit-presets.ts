@@ -1,5 +1,5 @@
-import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,7 +8,7 @@ import type { LanguageSpec } from '../catalog/types.js';
 import type { DetectedLanguage } from '../detect.js';
 import { PRESET_RIGHTHOOK_DIR, renderLefthook } from '../generate/lefthook.js';
 import { COVERAGE_GATE_PY, MERGE_CONFLICTS_SH, RUN_SH } from '../generate/runSh.js';
-import { ciLanguageIds, renderCaller, renderReusable } from '../generate/workflows.js';
+import { renderReusable } from '../generate/workflows.js';
 import { allToolsFor } from '../variants.js';
 
 const require = createRequire(import.meta.url);
@@ -94,7 +94,10 @@ export function renderPresets(version: string): Map<string, string> {
     'presets/lefthook-minimal.yml',
     header(
       'righthook: universal hooks plus one language',
-      renderLefthook(minimalMatrix(), { version, righthookDir: PRESET_RIGHTHOOK_DIR }),
+      renderLefthook(minimalMatrix(), {
+        version,
+        righthookDir: PRESET_RIGHTHOOK_DIR,
+      }),
     ),
   );
   // The reusable workflow lives at the package root, because that is the path
@@ -141,32 +144,9 @@ export function writePresets(version: string, packageRoot: string): string[] {
   writeFileSync(ownWorkflow, files.get('workflows/ci.yml')!, 'utf8');
   written.push('.github/workflows/ci.yml');
 
-  // The repository's own pipeline: a caller of the reusable definition above,
-  // exercising exactly what a consumer would. It runs the full matrix because
-  // this package is the one place that has to keep every language working.
-  const ownRunner = path.join(packageRoot, '.github/workflows/righthook.yml');
-  writeFileSync(
-    ownRunner,
-    renderCaller(
-      fullMatrix().filter(
-        (entry) => entry.language.id === 'universal' || ciLanguageIds().includes(entry.language.id),
-      ),
-      {
-        coverageThreshold: 80,
-        diffCoverage: 80,
-        ciMode: 'caller',
-        secretsTool: 'betterleaks',
-        root: '.',
-      },
-      // Self-reference, kept as a tag deliberately: a file cannot pin itself to
-      // the commit that contains it. `pinact run` rewrites tags to SHAs, and
-      // the tag form is otherwise exactly what a consumer writes.
-      'BillyOutlast/righthook/.github/workflows/ci.yml@v1',
-      version,
-    ),
-    'utf8',
-  );
-  written.push('.github/workflows/righthook.yml');
+  // This repository's own `.github/workflows/righthook.yml` is written by
+  // `righthook init`, not here: it must advertise the languages this repository
+  // actually has, which is a detection result, and detection is the CLI's job.
 
   // Ship the launcher scripts and the coverage gate so the presets and the
   // reusable workflow are functional on their own: preset `run:` lines point
@@ -191,7 +171,9 @@ export function writePresets(version: string, packageRoot: string): string[] {
 // generators must not depend on the caller's directory layout.
 if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1] ?? '')) {
   const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const pkg = require(path.join(packageRoot, 'package.json')) as { version: string };
+  const pkg = require(path.join(packageRoot, 'package.json')) as {
+    version: string;
+  };
   const written = writePresets(pkg.version, packageRoot);
   process.stdout.write(`presets: ${written.join(', ')}\n`);
 }

@@ -1,13 +1,13 @@
+import { LANGUAGES, requireLanguage } from './catalog/index.js';
 import type { LanguageSpec, ToolSpec } from './catalog/types.js';
-import { LANGUAGES, UNIVERSAL, requireLanguage } from './catalog/index.js';
 import {
   buildRepoIndex,
   declaredDeps,
   detectionMarkers,
   matchIndex,
+  type RepoIndex,
   resolveTools,
   selectVariant,
-  type RepoIndex,
 } from './variants.js';
 
 export interface DetectOptions {
@@ -92,7 +92,11 @@ export function parseLanguageList(value: string): string[] {
 export function detectLanguages(gitRoot: string, options: DetectOptions = {}): DetectResult {
   const index = buildRepoIndex(gitRoot);
 
-  const forced = new Set([...(options.languages ?? []), ...(options.addLanguages ?? [])].map((id) => requireLanguage(id).id));
+  const forced = new Set(
+    [...(options.languages ?? []), ...(options.addLanguages ?? [])].map(
+      (id) => requireLanguage(id).id,
+    ),
+  );
 
   // Catalog order, always with `universal` first: the manifest and the CLI
   // help stay stable regardless of how the language set was chosen.
