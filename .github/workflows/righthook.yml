@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   righthook:
-    uses: ./.github/workflows/ci.yml
+    uses: Heretek-AI/righthook/.github/workflows/ci.yml@05772f42e2a9e04f6eb7f237f8f1d95ef1631bb2 # v1
     with:
       languages: '["universal","typescript"]'
       coverage-threshold: 80
