@@ -61,10 +61,11 @@ Options
 export interface CliOptions {
   languages?: string[];
   addLanguages?: string[];
-  coverageThreshold: number;
-  diffCoverage: number;
-  ciMode: CiMode;
-  secretsTool: 'betterleaks' | 'gitleaks';
+  /** Unset when the flag was not given, so a recorded value can win. */
+  coverageThreshold?: number;
+  diffCoverage?: number;
+  ciMode?: CiMode;
+  secretsTool?: 'betterleaks' | 'gitleaks';
   root: string;
   force: boolean;
   install: boolean;
@@ -79,10 +80,6 @@ interface ParsedArgs {
 }
 
 const DEFAULTS: CliOptions = {
-  coverageThreshold: 80,
-  diffCoverage: 80,
-  ciMode: 'vendored',
-  secretsTool: 'betterleaks',
   root: '.',
   force: false,
   install: true,
@@ -293,15 +290,18 @@ async function runInit(cli: CliOptions, cwd: string, mode: 'init' | 'sync'): Pro
   });
   const detected = detectedResult.languages;
 
+  const existingManifest = readManifest(root);
+
+  // A command-line flag wins; otherwise a previously recorded choice is
+  // honoured, so `righthook sync` re-renders the configuration the repository
+  // was actually set up with rather than silently reverting it to defaults.
   const options: ManifestOptions = {
-    coverageThreshold: cli.coverageThreshold,
-    diffCoverage: cli.diffCoverage,
-    ciMode: cli.ciMode,
-    secretsTool: cli.secretsTool,
+    coverageThreshold: cli.coverageThreshold ?? existingManifest?.options.coverageThreshold ?? 80,
+    diffCoverage: cli.diffCoverage ?? existingManifest?.options.diffCoverage ?? 80,
+    ciMode: cli.ciMode ?? existingManifest?.options.ciMode ?? 'vendored',
+    secretsTool: cli.secretsTool ?? existingManifest?.options.secretsTool ?? 'betterleaks',
     root: relRoot === '' ? '.' : relRoot,
   };
-
-  const existingManifest = readManifest(root);
   // The caller mode must reference a pinned commit, so the release tag is
   // resolved against the published repository rather than emitted verbatim.
   const pinned = pinRemoteRef('Heretek-AI/righthook', 'v1');
