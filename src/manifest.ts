@@ -13,14 +13,14 @@ import path from 'node:path';
 /**
  * How the GitHub Actions pipeline is delivered.
  *
- * - `vendored` — the jobs are written into the consumer's repository.
- * - `caller`   — a thin call to the reusable workflow, pinned to a commit SHA.
- * - `local`    — a thin call via a same-repository path, for the repository
- *                that *owns* the reusable workflow. A tag reference would be
- *                self-referential and cached by GitHub, so a local path is the
- *                only form that always resolves to the checked-out commit.
+ * - `vendored` (the default) — the jobs are written into the consumer's
+ *   repository. This is the mode righthook's own repository uses, and the only
+ *   one verified end to end.
+ * - `caller` — a thin call to the reusable workflow, pinned to a commit SHA.
+ *   Documented and generated, but not yet verified green on a live repository:
+ *   see the README's limitations section.
  */
-export type CiMode = 'vendored' | 'caller' | 'local';
+export type CiMode = 'vendored' | 'caller';
 
 export interface ManifestOptions {
   coverageThreshold: number;

@@ -47,7 +47,7 @@ Options
   --add-languages x,y   union with the detected languages
   --coverage-threshold  minimum total line coverage percentage (default 80)
   --diff-coverage       minimum changed-line coverage on PRs (default 80)
-  --ci-mode             vendored (default), caller, or local
+  --ci-mode             vendored (default) or caller
   --secrets-tool        betterleaks (default) or gitleaks
   --root <dir>          write lefthook.yml and .righthook/ under <dir>
   --force               overwrite files that were modified locally
@@ -138,8 +138,8 @@ export function parseArgs(argv: string[]): ParsedArgs {
       }
       case '--ci-mode': {
         const value = next();
-        if (value !== 'vendored' && value !== 'caller' && value !== 'local') {
-          errors.push('--ci-mode must be "vendored", "caller" or "local"');
+        if (value !== 'vendored' && value !== 'caller') {
+          errors.push('--ci-mode must be "vendored" or "caller"');
         } else {
           options.ciMode = value;
         }

@@ -160,11 +160,6 @@ language. `presets/README.md` has the details.
 - **`--ci-mode vendored`** (default) writes `.github/workflows/righthook.yml`
   with the detected languages inlined and the thresholds baked in. Nothing else
   to set up.
-- **`--ci-mode local`** writes `uses: ./.github/workflows/ci.yml` — a
-  same-repository call, for a repository that owns the reusable workflow. A tag
-  reference would be self-referential and GitHub caches workflows per tag, so
-  the local path is the only form that always resolves to the checked-out
-  commit. This is how righthook's own repository runs.
 - **`--ci-mode caller`** writes a thin caller of the reusable workflow:
 
   ```yaml
@@ -182,6 +177,9 @@ language. `presets/README.md` has the details.
   in every generated file is pinned to a 40-character commit SHA with the
   release tag in a trailing comment, so the output passes the same
   `zizmor --pedantic --min-severity=low` check it deploys.
+
+righthook's own repository uses **vendored** mode, the only mode verified end
+to end (see the limitations below).
 
 Branch protection should point at the single **`required`** job, which fails
 whenever any other job did not succeed. `deps-review` runs on pull requests
@@ -238,6 +236,15 @@ owned and has its own override file.
   filtered out of every CI check, because they are righthook's output rather
   than yours. Edit them and the next `sync` will refuse to overwrite (except
   `lefthook.yml`, which is wholly owned).
+- **`--ci-mode caller` is generated but not proven.** The reusable workflow in
+  `workflows/ci.yml` and the caller that references it are structurally
+  validated (`actionlint`, `zizmor`) and the workflow's own jobs pass when
+  vendored, but every caller-form run attempted on a live repository — whether
+  `uses: owner/repo/.github/workflows/ci.yml@<sha>` or a same-repository
+  `uses: ./.github/workflows/ci.yml` — failed with `startup_failure`, and a
+  same-repository call to a _minimal_ reusable workflow succeeded, so the cause
+  is not yet isolated. Use the default `vendored` mode unless you are prepared
+  to debug that.
 - **Tool configuration is not generated.** righthook emits hooks, not
   `biome.json`, `ruff.toml`, `.golangci.yml` or `phpstan.neon`. A repository's
   existing config applies unchanged; one with no config gets each tool's
