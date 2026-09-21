@@ -66,10 +66,13 @@ export const ACTIONS = {
   },
   codeql: {
     repo: 'github/codeql-action',
-    // v4: v3 is deprecated in December 2026, and the deprecation warning is
-    // raised by the very workflow this action is generated into.
-    sha: '1c5b675653bb5c22dbe9b12b556ec555138e09fd',
-    tag: 'v4',
+    // v3, not v4. v4 is published and its `upload-sarif` resolves by SHA, but
+    // referencing it makes the whole workflow fail to *start* rather than fail
+    // a job — verified on this repository, where the identical workflow passes
+    // on v3 and reports `startup_failure` on v4. v3 carries a deprecation
+    // notice (December 2026); revisit when v4 is safe to adopt.
+    sha: '3ea06614dafe36dec890db3446326e0d40ce53d4',
+    tag: 'v3',
   },
   setupRuby: {
     repo: 'ruby/setup-ruby',
