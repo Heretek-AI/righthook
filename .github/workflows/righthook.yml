@@ -47,17 +47,20 @@ jobs:
         with:
           persist-credentials: false
       - run: |
-          curl -fsSL https://raw.githubusercontent.com/betterleaks/betterleaks/main/scripts/install.sh | sh
-          ./bin/betterleaks git . --redact --report-format sarif --report-path leaks.sarif || true
+          set -euo pipefail
+          VERSION=$(curl -fsSL https://api.github.com/repos/betterleaks/betterleaks/releases/latest | jq -r .tag_name)
+          curl -fsSL "https://github.com/betterleaks/betterleaks/releases/download/${VERSION}/betterleaks_${VERSION#v}_linux_x64.tar.gz" -o /tmp/betterleaks.tar.gz
+          sudo tar -xzf /tmp/betterleaks.tar.gz -C /usr/local/bin betterleaks
+          betterleaks git . --redact --report-format sarif --report-path leaks.sarif || true
       - run: |
           curl -fsSL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
           trivy fs --format sarif --output trivy.sarif --scanners vuln,misconfig,secret . || true
-      - if: always()
+      - if: always() && hashFiles('leaks.sarif') != ''
         uses: github/codeql-action/upload-sarif@3ea06614dafe36dec890db3446326e0d40ce53d4 # v3
         with:
           sarif_file: leaks.sarif
           category: betterleaks
-      - if: always()
+      - if: always() && hashFiles('trivy.sarif') != ''
         uses: github/codeql-action/upload-sarif@3ea06614dafe36dec890db3446326e0d40ce53d4 # v3
         with:
           sarif_file: trivy.sarif

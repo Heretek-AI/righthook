@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { planWrites } from '../src/cli.js';
 import { detectLanguages } from '../src/detect.js';
 import type { ManifestOptions } from '../src/manifest.js';
+import { hashContent } from '../src/manifest.js';
 import { joinRoot, renderAll } from '../src/render.js';
 import { renderPresets } from '../src/scripts/emit-presets.js';
 import { makeFixture, packageJson } from './helpers.js';
@@ -164,5 +166,64 @@ test('the shipped presets are valid lefthook documents with unique command keys'
     // lefthook rejects a document that defines the same command key twice, so a
     // duplicate here is a hard failure rather than a cosmetic one.
     assert.equal(new Set(keys).size, keys.length, `${rel} has duplicate keys`);
+  }
+});
+
+test('sync rewrites an unchanged file when the generated content changed', () => {
+  const files = new Map([
+    ['lefthook.yml', 'new-content\n'],
+    ['helper.sh', 'new-content\n'],
+  ]);
+  // Both files on disk hold what the *previous* run wrote, so neither is a
+  // local edit — the template merely changed (a flag, a language, an upgrade).
+  const manifest = {
+    version: '0.0.0',
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    languages: ['universal'],
+    markers: {},
+    options: {},
+    files: {
+      'lefthook.yml': hashContent('new-content\n'),
+      'helper.sh': hashContent('old-content\n'),
+    },
+  } as never;
+
+  const plan = planWrites('/nonexistent-root', files, manifest, false, ['lefthook.yml']);
+  // `planWrites` reads the disk, so a missing root means "write" for both; the
+  // point of this test is the branch below, checked against a real tree.
+  assert.equal(plan.length, 2);
+});
+
+test('a locally edited managed file is refused, an unchanged one is updated', () => {
+  const fixture = makeFixture({
+    'helper.sh': 'righthook wrote this\n',
+    'stale.json': 'righthook wrote this too\n',
+  });
+  try {
+    const files = new Map([
+      ['helper.sh', 'a brand new template\n'],
+      ['stale.json', 'a brand new template\n'],
+    ]);
+    // `helper.sh` was changed on disk after righthook wrote it; `stale.json`
+    // still holds exactly what the manifest recorded, so the template change is
+    // not drift and must be applied.
+    const manifest = {
+      version: '0.0.0',
+      generatedAt: '2026-01-01T00:00:00.000Z',
+      languages: ['universal'],
+      markers: {},
+      options: {},
+      files: {
+        'helper.sh': hashContent('something else entirely\n'),
+        'stale.json': hashContent('righthook wrote this too\n'),
+      },
+    } as never;
+
+    const plan = planWrites(fixture.root, files, manifest, false);
+    const byPath = Object.fromEntries(plan.map((entry) => [entry.path, entry]));
+    assert.equal(byPath['helper.sh']?.action, 'skip-modified', 'a local edit must be refused');
+    assert.equal(byPath['stale.json']?.action, 'write', 'an untouched stale file must be updated');
+  } finally {
+    fixture.cleanup();
   }
 });

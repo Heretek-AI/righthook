@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "generatedAt": "2026-09-21T17:01:03.050Z",
+  "generatedAt": "2026-09-21T17:06:10.898Z",
   "languages": [
     "universal",
     "typescript"
@@ -20,7 +20,7 @@
   "files": {
     ".editorconfig": "b98dc22e673777689e25d4af6f9e928f7ca9a50725ef2cf7584d3ceda75475c6",
     ".github/dependabot.yml": "30b836e53137f5ff53994ae345c8bd06d8af3c1d18fc8a9a22b8661722c01269",
-    ".github/workflows/righthook.yml": "58dceae2c49c53532ca273ee17763afe68a93d337b138cdbd9b7e1215d5647ac",
+    ".github/workflows/righthook.yml": "2aac58a9b2c18e416053eb0104309ce0c3f0585966fe7c03554c4a4c50061a67",
     ".righthook/coverage_gate.py": "3d7cbcf41ef06fe099328d11e039865ea53fd2128d86750bffa4824f6f63523a",
     ".righthook/jscpd.json": "c37f60b2d5686fa75f56b0bd5c201c755cd7c02be0fb6c5abf2d70620d598538",
     ".righthook/merge-conflicts.sh": "b59bf0d681a7e695b78303ed7a947e7428df4c70bd045b28c4ccf418cabc8bf7",

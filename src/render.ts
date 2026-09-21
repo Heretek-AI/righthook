@@ -14,7 +14,7 @@ import {
 } from './generate/aux.js';
 import { LOCAL_RIGHTHOOK_DIR, renderLefthook } from './generate/lefthook.js';
 import { COVERAGE_GATE_PY, MERGE_CONFLICTS_SH, RUN_SH, SIMPLECOV_RB } from './generate/runSh.js';
-import { renderCaller, renderVendored } from './generate/workflows.js';
+import { renderCaller, renderLocalCaller, renderVendored } from './generate/workflows.js';
 import type { ManifestOptions } from './manifest.js';
 
 /**
@@ -115,7 +115,9 @@ export function renderAll(input: RenderInput): RenderedFiles {
     GITHUB_PATHS.workflow,
     options.ciMode === 'caller'
       ? renderCaller(detected, options, input.packageRef, version)
-      : renderVendored(detected, options, version),
+      : options.ciMode === 'local'
+        ? renderLocalCaller(detected, options, version)
+        : renderVendored(detected, options, version),
   );
   files.set(GITHUB_PATHS.dependabot, renderDependabot(detected));
 

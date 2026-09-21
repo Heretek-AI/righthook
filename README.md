@@ -160,6 +160,11 @@ language. `presets/README.md` has the details.
 - **`--ci-mode vendored`** (default) writes `.github/workflows/righthook.yml`
   with the detected languages inlined and the thresholds baked in. Nothing else
   to set up.
+- **`--ci-mode local`** writes `uses: ./.github/workflows/ci.yml` — a
+  same-repository call, for a repository that owns the reusable workflow. A tag
+  reference would be self-referential and GitHub caches workflows per tag, so
+  the local path is the only form that always resolves to the checked-out
+  commit. This is how righthook's own repository runs.
 - **`--ci-mode caller`** writes a thin caller of the reusable workflow:
 
   ```yaml
@@ -213,11 +218,14 @@ Run `righthook init` once per managed subdirectory.
 `righthook sync` compares every managed file against the hashes in
 `.righthook/manifest.json`:
 
-- unchanged → left alone;
-- modified since the last run → **refused**, with the file named. `--force`
-  overwrites and updates the hash;
-- a file that exists but is not recorded (a hand-written `lefthook.yml`) →
-  `init` refuses outright; `--force` takes ownership.
+- on disk identical to what would be written → left alone;
+- on disk untouched but the _generated content changed_ → rewritten. This is
+  the upgrade path: a new package version, a changed flag or a newly detected
+  language legitimately changes the template, and that is not drift;
+- on disk differing from what the manifest recorded → a local edit, **refused**
+  with the file named. `--force` overwrites and updates the hash;
+- present but never recorded (a hand-written `lefthook.yml`) → `init` refuses
+  outright; `--force` takes ownership.
 
 `lefthook.yml` is the exception: it is always rewritten, because it is wholly
 owned and has its own override file.

@@ -10,10 +10,22 @@ import path from 'node:path';
  * treated as locally edited and left alone unless `--force`.
  */
 
+/**
+ * How the GitHub Actions pipeline is delivered.
+ *
+ * - `vendored` — the jobs are written into the consumer's repository.
+ * - `caller`   — a thin call to the reusable workflow, pinned to a commit SHA.
+ * - `local`    — a thin call via a same-repository path, for the repository
+ *                that *owns* the reusable workflow. A tag reference would be
+ *                self-referential and cached by GitHub, so a local path is the
+ *                only form that always resolves to the checked-out commit.
+ */
+export type CiMode = 'vendored' | 'caller' | 'local';
+
 export interface ManifestOptions {
   coverageThreshold: number;
   diffCoverage: number;
-  ciMode: 'vendored' | 'caller';
+  ciMode: CiMode;
   secretsTool: 'betterleaks' | 'gitleaks';
   root: string;
 }

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { knownLanguageIds, LANGUAGES } from './catalog/index.js';
 import type { InstallHints, ToolSpec } from './catalog/types.js';
 import { detectLanguages, parseLanguageList } from './detect.js';
+import type { CiMode } from './manifest.js';
 import {
   checkDrift,
   hashContent,
@@ -46,7 +47,7 @@ Options
   --add-languages x,y   union with the detected languages
   --coverage-threshold  minimum total line coverage percentage (default 80)
   --diff-coverage       minimum changed-line coverage on PRs (default 80)
-  --ci-mode             vendored (default) or caller
+  --ci-mode             vendored (default), caller, or local
   --secrets-tool        betterleaks (default) or gitleaks
   --root <dir>          write lefthook.yml and .righthook/ under <dir>
   --force               overwrite files that were modified locally
@@ -62,7 +63,7 @@ export interface CliOptions {
   addLanguages?: string[];
   coverageThreshold: number;
   diffCoverage: number;
-  ciMode: 'vendored' | 'caller';
+  ciMode: CiMode;
   secretsTool: 'betterleaks' | 'gitleaks';
   root: string;
   force: boolean;
@@ -140,8 +141,8 @@ export function parseArgs(argv: string[]): ParsedArgs {
       }
       case '--ci-mode': {
         const value = next();
-        if (value !== 'vendored' && value !== 'caller') {
-          errors.push('--ci-mode must be "vendored" or "caller"');
+        if (value !== 'vendored' && value !== 'caller' && value !== 'local') {
+          errors.push('--ci-mode must be "vendored", "caller" or "local"');
         } else {
           options.ciMode = value;
         }
@@ -214,12 +215,20 @@ interface WritePlan {
 /**
  * Decide what to do with each rendered file.
  *
+ * Three cases matter, and the middle one is subtle:
+ *
+ * - On disk unmodified and the generated content is identical → nothing to do.
+ * - On disk unmodified, but the generated content *changed* (a flag, a detected
+ *   language, or a package upgrade altered the template) → write. This is what
+ *   `sync` exists for; refusing it would make upgrades impossible.
+ * - On disk differing from what the manifest recorded → a local edit. Refuse,
+ *   unless `--force`.
+ *
+ * A file present on disk but never recorded is a hand-written file from before
+ * righthook was installed, and is protected the same way.
+ *
  * `lefthook.yml` is always rewritten: it is wholly owned by righthook, and
- * local customization has its own sanctioned home (`lefthook-local.yml`,
- * lefthook's highest-precedence override file). Every other file is skipped
- * when it is *both* recorded in the manifest and changed on disk — the
- * signature of a local edit. A file that exists on disk without being recorded
- * is the `init`-into-an-existing-repo case and is protected unless `--force`.
+ * local customization has its own sanctioned home (`lefthook-local.yml`).
  */
 export function planWrites(
   root: string,
@@ -233,25 +242,30 @@ export function planWrites(
   const always = new Set(whitelist);
 
   for (const [rel, content] of files) {
-    const abs = path.join(root, rel);
-    const existing = hashFileSafe(abs);
+    const existing = hashFileSafe(path.join(root, rel));
     const expected = recorded[rel];
     const newHash = hashContent(content);
 
-    if (existing === undefined || existing === newHash || always.has(rel) || force) {
-      plan.push({ path: rel, action: existing === newHash ? 'keep' : 'write' });
+    if (existing === undefined) {
+      plan.push({ path: rel, action: 'write' });
+    } else if (existing === newHash) {
+      plan.push({ path: rel, action: 'keep' });
+    } else if (force || always.has(rel)) {
+      plan.push({ path: rel, action: 'write' });
     } else if (expected === undefined) {
       plan.push({
         path: rel,
         action: 'skip-unmanaged',
         reason: 'exists, not managed by righthook',
       });
-    } else {
+    } else if (existing !== expected) {
       plan.push({
         path: rel,
         action: 'skip-modified',
         reason: 'modified locally',
       });
+    } else {
+      plan.push({ path: rel, action: 'write' });
     }
   }
   return plan;
