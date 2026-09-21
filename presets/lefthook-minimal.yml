@@ -29,7 +29,7 @@ pre-commit:
         - .editorconfig
         - .yamllint.yaml
         - commitlint.config.mjs
-      run: "sh node_modules/righthook/.righthook/run.sh sh node_modules/righthook/.righthook/merge-conflicts.sh {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh sh node_modules/@heretek-ai/righthook/.righthook/merge-conflicts.sh {staged_files}"
     prettier-other:
       priority: 1
       glob: "*.{md,mdx,yml,yaml,json,jsonc,css,scss,html}"
@@ -42,7 +42,7 @@ pre-commit:
         - .yamllint.yaml
         - commitlint.config.mjs
       stage_fixed: true
-      run: "sh node_modules/righthook/.righthook/run.sh prettier --write --ignore-unknown {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh prettier --write --ignore-unknown {staged_files}"
     ruff-format:
       priority: 1
       glob: "*.py"
@@ -55,7 +55,7 @@ pre-commit:
         - .yamllint.yaml
         - commitlint.config.mjs
       stage_fixed: true
-      run: "sh node_modules/righthook/.righthook/run.sh ruff format {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh ruff format {staged_files}"
     shfmt:
       priority: 1
       glob: "*.{sh,bash}"
@@ -68,7 +68,7 @@ pre-commit:
         - .yamllint.yaml
         - commitlint.config.mjs
       stage_fixed: true
-      run: "sh node_modules/righthook/.righthook/run.sh shfmt -w -i 2 -ci {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh shfmt -w -i 2 -ci {staged_files}"
     ruff-check:
       priority: 2
       glob: "*.py"
@@ -81,7 +81,7 @@ pre-commit:
         - .yamllint.yaml
         - commitlint.config.mjs
       stage_fixed: true
-      run: "sh node_modules/righthook/.righthook/run.sh ruff check --fix --force-exclude {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh ruff check --fix --force-exclude {staged_files}"
     typos-fix:
       priority: 2
       exclude:
@@ -93,10 +93,10 @@ pre-commit:
         - .yamllint.yaml
         - commitlint.config.mjs
       stage_fixed: true
-      run: "sh node_modules/righthook/.righthook/run.sh typos --write-changes --force-exclude {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh typos --write-changes --force-exclude {staged_files}"
     betterleaks:
       priority: 3
-      run: "sh node_modules/righthook/.righthook/run.sh betterleaks git --pre-commit --staged --redact --verbose"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh betterleaks git --pre-commit --staged --redact --verbose"
     editorconfig:
       priority: 4
       exclude:
@@ -107,7 +107,7 @@ pre-commit:
         - .editorconfig
         - .yamllint.yaml
         - commitlint.config.mjs
-      run: "sh node_modules/righthook/.righthook/run.sh editorconfig-checker {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh editorconfig-checker {staged_files}"
     hadolint:
       priority: 5
       glob: Dockerfile*
@@ -119,7 +119,7 @@ pre-commit:
         - .editorconfig
         - .yamllint.yaml
         - commitlint.config.mjs
-      run: "sh node_modules/righthook/.righthook/run.sh hadolint {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh hadolint {staged_files}"
     markdownlint:
       priority: 5
       glob: "*.{md,mdx}"
@@ -131,7 +131,7 @@ pre-commit:
         - .editorconfig
         - .yamllint.yaml
         - commitlint.config.mjs
-      run: "sh node_modules/righthook/.righthook/run.sh markdownlint-cli2 {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh markdownlint-cli2 {staged_files}"
     shellcheck:
       priority: 5
       glob: "*.{sh,bash}"
@@ -143,7 +143,7 @@ pre-commit:
         - .editorconfig
         - .yamllint.yaml
         - commitlint.config.mjs
-      run: "sh node_modules/righthook/.righthook/run.sh shellcheck {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh shellcheck {staged_files}"
     yamllint:
       priority: 5
       glob: "*.{yml,yaml}"
@@ -155,51 +155,51 @@ pre-commit:
         - .editorconfig
         - .yamllint.yaml
         - commitlint.config.mjs
-      run: "sh node_modules/righthook/.righthook/run.sh yamllint -c .yamllint.yaml {staged_files}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh yamllint -c .yamllint.yaml {staged_files}"
 
 pre-push:
   parallel: false
   commands:
     osv-scanner:
       priority: 1
-      run: "sh node_modules/righthook/.righthook/run.sh osv-scanner scan source --recursive --config .righthook/osv-scanner.toml ."
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh osv-scanner scan source --recursive --config .righthook/osv-scanner.toml ."
     pip-audit:
       priority: 1
-      run: "sh node_modules/righthook/.righthook/run.sh pip-audit --strict --progress-spinner off"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh pip-audit --strict --progress-spinner off"
     bandit:
       priority: 2
-      run: "sh node_modules/righthook/.righthook/run.sh bandit -q -r . -x ./tests,./test,./.venv"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh bandit -q -r . -x ./tests,./test,./.venv"
     jscpd:
       priority: 2
-      run: "sh node_modules/righthook/.righthook/run.sh jscpd --config .righthook/jscpd.json --threshold 5 ."
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh jscpd --config .righthook/jscpd.json --threshold 5 ."
     pytest:
       priority: 2
-      run: "sh node_modules/righthook/.righthook/run.sh pytest -q --cov --cov-report=xml:coverage/cobertura.xml --cov-report=term"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh pytest -q --cov --cov-report=xml:coverage/cobertura.xml --cov-report=term"
     betterleaks-deep:
       priority: 3
-      run: "sh node_modules/righthook/.righthook/run.sh betterleaks git . --redact --verbose"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh betterleaks git . --redact --verbose"
     vulture:
       priority: 3
-      run: "sh node_modules/righthook/.righthook/run.sh vulture --min-confidence 80 ."
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh vulture --min-confidence 80 ."
     typos:
       priority: 4
-      run: "sh node_modules/righthook/.righthook/run.sh typos --force-exclude ."
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh typos --force-exclude ."
     actionlint:
       priority: 5
-      run: "sh node_modules/righthook/.righthook/run.sh actionlint"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh actionlint"
     mypy:
       priority: 5
-      run: "sh node_modules/righthook/.righthook/run.sh mypy --install-types --non-interactive ."
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh mypy --install-types --non-interactive ."
     zizmor:
       priority: 6
-      run: "sh node_modules/righthook/.righthook/run.sh zizmor --pedantic --min-severity=low .github/workflows"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh zizmor --pedantic --min-severity=low .github/workflows"
     trivy-config:
       priority: 7
-      run: "sh node_modules/righthook/.righthook/run.sh trivy config --exit-code 1 --severity HIGH,CRITICAL --skip-dirs .git ."
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh trivy config --exit-code 1 --severity HIGH,CRITICAL --skip-dirs .git ."
 
 commit-msg:
   parallel: false
   commands:
     commitlint:
       priority: 1
-      run: "sh node_modules/righthook/.righthook/run.sh commitlint --edit {1}"
+      run: "sh node_modules/@heretek-ai/righthook/.righthook/run.sh commitlint --edit {1}"

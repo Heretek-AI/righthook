@@ -23,7 +23,7 @@ export interface GenerateOptions {
   /**
    * Git-root-relative path of the generated `.righthook/` directory, e.g.
    * `.righthook`, `services/api/.righthook`, or
-   * `node_modules/righthook/.righthook` for a preset. Every generated `run:`
+   * `node_modules/@heretek-ai/righthook/.righthook` for a preset. Every generated `run:`
    * line goes through this directory, because lefthook executes commands with
    * cwd at the git root regardless of where `lefthook.yml` lives.
    */
@@ -194,4 +194,3 @@ export function renderLefthook(detected: DetectedLanguage[], options: GenerateOp
 export const LOCAL_RIGHTHOOK_DIR = '.righthook';
 
 /** The path a preset consumer's commands use, inside the installed package. */
-export const PRESET_RIGHTHOOK_DIR = 'node_modules/righthook/.righthook';

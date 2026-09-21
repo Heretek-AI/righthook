@@ -4,7 +4,7 @@ Single, self-contained lefthook documents — for repositories that want
 righthook's hook matrix through `extends` rather than by generating files.
 
 | Preset | Contents |
-|---|---|
+| --- | --- |
 | `lefthook.all.yml` | Every language in the matrix. |
 | `lefthook-minimal.yml` | Universal hooks plus one language. |
 | `workflows/ci.yml` | The reusable `workflow_call` pipeline. |
@@ -32,7 +32,7 @@ The consequences, which this package's layout is built around:
    times`.
 3. **`run:` paths resolve against the git root too**, so every command in these
    presets goes through
-   `node_modules/righthook/.righthook/run.sh`.
+   `node_modules/@heretek-ai/righthook/.righthook/run.sh`.
 
 Because a recursive `extends` graph is what triggers all three, righthook ships
 one flattened document per preset instead. That is also why the **default**
@@ -41,13 +41,13 @@ delivery mode writes a generated `lefthook.yml` rather than extending anything.
 ## Use a preset
 
 ```sh
-npm install -D righthook lefthook
+npm install -D @heretek-ai/righthook lefthook
 ```
 
 ```yaml
 # lefthook.yaml
 extends:
-  - node_modules/righthook/presets/lefthook.all.yml
+  - node_modules/@heretek-ai/righthook/presets/lefthook.all.yml
 ```
 
 ```sh
@@ -75,10 +75,10 @@ jobs:
     secrets: inherit
 ```
 
-Get the `languages` value from `npx righthook doctor --json`.
+Get the `languages` value from `npx @heretek-ai/righthook doctor --json`.
 
 ## Generated mode instead
 
-`npx righthook init` writes a `lefthook.yml` and a workflow containing only the
+`npx @heretek-ai/righthook init` writes a `lefthook.yml` and a workflow containing only the
 languages the repository actually uses. That is the recommended path, and the
 one the README documents in full.

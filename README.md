@@ -4,7 +4,7 @@ Deploy a [lefthook](https://github.com/evilmartians/lefthook) git-hook
 configuration and a matching GitHub Actions pipeline into any repository.
 
 ```sh
-npx righthook init
+npx @heretek-ai/righthook init
 ```
 
 One command, and a polyglot repository gets format, lint, type-check, static
@@ -149,7 +149,7 @@ preset _and_ a fragment it already pulls in.
 ```yaml
 # lefthook.yaml — one self-contained preset, no recursion
 extends:
-  - node_modules/righthook/presets/lefthook.all.yml
+  - node_modules/@heretek-ai/righthook/presets/lefthook.all.yml
 ```
 
 `presets/lefthook-minimal.yml` is the same shape with universal hooks plus one
@@ -165,7 +165,7 @@ language. `presets/README.md` has the details.
   ```yaml
   jobs:
     righthook:
-      uses: <owner>/righthook/.github/workflows/ci.yml@<sha>
+      uses: <owner>/<repo>/.github/workflows/ci.yml@<sha>
       with:
         languages: '["universal","typescript","go"]'
         coverage-threshold: 80
@@ -270,6 +270,36 @@ owned and has its own override file.
   locally — CI is unaffected.
 - **Node.js ≥ 20.19** to run the generator; the generated hooks need only `sh`
   and whichever tools you have.
+
+## Publishing
+
+The package is published under the `@heretek-ai` scope as a public package. It
+depends on no build host beyond a Node toolchain, and `prepublishOnly` runs the
+full check (build + `biome ci` + tests) before anything is uploaded, so a
+release cannot ship a broken tree.
+
+```sh
+npm login                       # an account that is a member of the @heretek-ai org
+npm publish --access public     # publishConfig already sets access: public
+```
+
+`publishConfig.provenance` is deliberately **not** set. Provenance requires an
+OIDC-attested publish from CI (`id-token: write` in a GitHub Actions job); with
+it enabled, a local `npm publish` fails. Add `--provenance` on the CI run when
+you want it:
+
+```sh
+npm publish --access public --provenance   # from GitHub Actions, id-token: write
+```
+
+Verify a release the way a consumer will, from a scratch repository:
+
+```sh
+npm pack                                        # build the tarball
+npm install -D ./heretek-ai-righthook-0.1.0.tgz # in a scratch git repo
+npx righthook init --no-install
+lefthook validate
+```
 
 ## Development
 

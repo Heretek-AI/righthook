@@ -665,7 +665,7 @@ jobs:
       - run: |
           ls -la coverage || true
           if [ ! -f "$GATE_SCRIPT" ]; then
-            GATE_SCRIPT=node_modules/righthook/.righthook/coverage_gate.py
+            GATE_SCRIPT=node_modules/@heretek-ai/righthook/.righthook/coverage_gate.py
           fi
           python3 "$GATE_SCRIPT" --threshold "$COVERAGE_THRESHOLD" --report typescript=coverage/coverage-typescript/lcov.info --report python=coverage/coverage-python/cobertura.xml --report go=coverage/coverage-go/cobertura.xml --report rust=coverage/coverage-rust/lcov.info --report ruby=coverage/coverage-ruby/cobertura.xml --report php=coverage/coverage-php/cobertura.xml --report java=coverage/coverage-java/jacoco.xml --report kotlin=coverage/coverage-kotlin/jacocoTestReport.xml --report dotnet=coverage/coverage-dotnet/coverage.cobertura.xml --report swift=coverage/coverage-swift/lcov.info --report dart=coverage/coverage-dart/lcov.info --report cpp=coverage/coverage-cpp/cobertura.xml
         env:

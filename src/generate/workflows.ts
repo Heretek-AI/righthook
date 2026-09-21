@@ -1,6 +1,7 @@
 import type { ToolSpec } from '../catalog/types.js';
 import type { DetectedLanguage } from '../detect.js';
 import type { ManifestOptions } from '../manifest.js';
+import { PACKAGE_DIR } from '../packageName.js';
 import { GENERATED_EXCLUDES } from './lefthook.js';
 
 /**
@@ -921,7 +922,7 @@ export function renderReusable(detected: DetectedLanguage[], version: string): s
         // Prefer the caller's generated copy; fall back to the one shipped
         // beside the reusable workflow so a `--root <subdir>` caller works too.
         'if [ ! -f "$GATE_SCRIPT" ]; then',
-        '  GATE_SCRIPT=node_modules/righthook/.righthook/coverage_gate.py',
+        `  GATE_SCRIPT=${PACKAGE_DIR}/.righthook/coverage_gate.py`,
         'fi',
         'python3 "$GATE_SCRIPT" --threshold "$COVERAGE_THRESHOLD"' +
           reports.map((report) => ` --report ${report}`).join(''),

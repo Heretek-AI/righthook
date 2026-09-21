@@ -6,9 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { LANGUAGES } from '../catalog/index.js';
 import type { LanguageSpec } from '../catalog/types.js';
 import type { DetectedLanguage } from '../detect.js';
-import { PRESET_RIGHTHOOK_DIR, renderLefthook } from '../generate/lefthook.js';
+import { renderLefthook } from '../generate/lefthook.js';
 import { COVERAGE_GATE_PY, MERGE_CONFLICTS_SH, RUN_SH } from '../generate/runSh.js';
 import { renderReusable } from '../generate/workflows.js';
+import { PACKAGE_DIR } from '../packageName.js';
 import { allToolsFor } from '../variants.js';
 
 const require = createRequire(import.meta.url);
@@ -29,6 +30,14 @@ const require = createRequire(import.meta.url);
  * entire class of bug — which is exactly why the default delivery mode
  * generates one file instead of extending anything.
  */
+
+/**
+ * Where a preset consumer's generated commands find the launcher scripts.
+ *
+ * lefthook resolves `run:` against the git root, so a preset's commands have to
+ * point into the installed package.
+ */
+const PRESET_RIGHTHOOK_DIR = `${PACKAGE_DIR}/.righthook`;
 
 /** Every language, with its first variant and every conditional tool. */
 export function fullMatrix(): DetectedLanguage[] {
@@ -150,7 +159,7 @@ export function writePresets(version: string, packageRoot: string): string[] {
 
   // Ship the launcher scripts and the coverage gate so the presets and the
   // reusable workflow are functional on their own: preset `run:` lines point
-  // at `node_modules/righthook/.righthook/*`, and the reusable workflow's gate
+  // at `node_modules/@heretek-ai/righthook/.righthook/*`, and the reusable workflow's gate
   // step invokes both the consumer's and this copy.
   for (const [rel, content] of [
     ['.righthook/run.sh', RUN_SH] as const,

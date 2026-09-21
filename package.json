@@ -1,5 +1,5 @@
 {
-  "name": "righthook",
+  "name": "@heretek-ai/righthook",
   "version": "0.1.0",
   "description": "Deploy a lefthook git-hook configuration and a matching GitHub Actions pipeline into any repository.",
   "license": "MIT",
@@ -13,7 +13,9 @@
     "src",
     "presets",
     "workflows",
-    ".righthook",
+    ".righthook/run.sh",
+    ".righthook/merge-conflicts.sh",
+    ".righthook/coverage_gate.py",
     "README.md",
     "LICENSE"
   ],
@@ -21,8 +23,7 @@
     "node": ">=20.19.0"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && node dist/scripts/emit-presets.js",
@@ -31,7 +32,8 @@
     "prepare": "npm run build",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/test/*.test.js",
     "check": "npm run build && npm run lint && npm run test",
-    "presets": "node dist/scripts/emit-presets.js"
+    "presets": "node dist/scripts/emit-presets.js",
+    "prepublishOnly": "npm run check"
   },
   "dependencies": {
     "picocolors": "^1.1.1",
