@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.test-build/
+*.tsbuildinfo
+*.tgz
+
+# Scratch reference checkouts used while designing the catalog. Not part of
+# the package and not something to vendor into this repository.
+review/

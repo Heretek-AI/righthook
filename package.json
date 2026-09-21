@@ -1,0 +1,55 @@
+{
+  "name": "righthook",
+  "version": "0.1.0",
+  "description": "Deploy a lefthook git-hook configuration and a matching GitHub Actions pipeline into any repository.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "righthook": "./bin/righthook.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "src",
+    "presets",
+    "workflows",
+    ".righthook",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node dist/scripts/emit-presets.js",
+    "prepare": "npm run build",
+    "test": "tsc -p tsconfig.test.json && node --test .test-build/test/*.test.js",
+    "check": "npm run build && npm run test",
+    "presets": "node dist/scripts/emit-presets.js"
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.7.2"
+  },
+  "keywords": [
+    "lefthook",
+    "git-hooks",
+    "lint",
+    "pre-commit",
+    "github-actions",
+    "code-quality"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BillyOutlast/righthook.git"
+  }
+}

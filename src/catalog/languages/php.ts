@@ -1,0 +1,83 @@
+import type { LanguageSpec } from '../types.js';
+
+export const php: LanguageSpec = {
+  id: 'php',
+  label: 'PHP',
+  detect: ['composer.json'],
+  fileGlob: '*.php',
+  ciSetup: ['php'],
+  dependabot: ['composer'],
+  ciInstall: ['composer install --no-interaction --prefer-dist'],
+  tools: [
+    {
+      id: 'php-cs-fixer',
+      category: 'format',
+      hook: 'pre-commit',
+      argv: 'php-cs-fixer fix --config=.php-cs-fixer.dist.php {staged_files}',
+      ciArgv: 'php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff',
+      priority: 1,
+      stageFixed: true,
+      install: {
+        brew: 'brew install php-cs-fixer',
+        url: 'https://cs.symfony.com',
+      },
+    },
+    {
+      id: 'phpcs',
+      category: 'lint',
+      hook: 'pre-commit',
+      argv: 'phpcs --standard=phpcs.xml.dist {staged_files}',
+      ciArgv: 'phpcs --standard=phpcs.xml.dist',
+      priority: 2,
+      install: {
+        brew: 'brew install php-code-sniffer',
+        url: 'https://github.com/PHPCSStandards/PHP_CodeSniffer',
+      },
+    },
+    {
+      id: 'phpstan',
+      category: 'typecheck',
+      hook: 'pre-push',
+      argv: 'phpstan analyse --no-progress --memory-limit=1G',
+      ciArgv: 'phpstan analyse --no-progress --memory-limit=1G',
+      priority: 5,
+      install: {
+        brew: 'brew install phpstan',
+        url: 'https://phpstan.org',
+      },
+    },
+    {
+      id: 'composer-audit',
+      category: 'deps',
+      hook: 'pre-push',
+      argv: 'composer audit --no-dev --locked',
+      ciArgv: 'composer audit --no-dev --locked',
+      priority: 1,
+      install: { url: 'https://getcomposer.org/doc/03-cli.md#audit' },
+    },
+    {
+      id: 'phpunit',
+      category: 'test',
+      hook: 'pre-push',
+      argv: 'phpunit --coverage-clover coverage/cobertura.xml',
+      ciArgv: 'phpunit --coverage-clover coverage/cobertura.xml',
+      priority: 2,
+      before: ['mkdir -p coverage'],
+      coverageArtifact: 'cobertura',
+      coveragePath: 'coverage/cobertura.xml',
+      install: { brew: 'brew install phpunit', url: 'https://phpunit.de' },
+    },
+    {
+      id: 'dead-code-detector',
+      category: 'deadcode',
+      hook: 'pre-push',
+      argv: 'phpstan analyse --no-progress --memory-limit=1G',
+      ciArgv: 'phpstan analyse --no-progress --memory-limit=1G',
+      priority: 3,
+      ciOnly: true,
+      install: {
+        url: 'https://github.com/shipmonk-rnd/dead-code-detector',
+      },
+    },
+  ],
+};
