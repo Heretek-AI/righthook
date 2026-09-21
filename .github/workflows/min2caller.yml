@@ -1,5 +1,8 @@
 name: min2caller
-on: workflow_dispatch
+on:
+  push:
+    branches: [main]
+  pull_request:
 permissions:
   contents: read
 jobs:
