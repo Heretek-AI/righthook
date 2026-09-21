@@ -5,16 +5,16 @@
     "clientKind": "git",
     // Respect .gitignore, so build output, vendored trees and scratch
     // checkouts are never linted.
-    "useIgnoreFile": true,
+    "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**/*.ts", "test/**/*.ts", "bin/**/*.js"],
+    "includes": ["src/**/*.ts", "test/**/*.ts", "bin/**/*.js"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100,
+    "lineWidth": 100
   },
   "javascript": {
     "formatter": {
@@ -22,8 +22,8 @@
       "semicolons": "always",
       "trailingCommas": "all",
       "arrowParentheses": "always",
-      "bracketSpacing": true,
-    },
+      "bracketSpacing": true
+    }
   },
   "linter": {
     "enabled": true,
@@ -34,13 +34,13 @@
         "noConsole": "off",
         // This package's output *is* GitHub Actions expressions and shell
         // parameter expansions in string literals, not JS interpolation.
-        "noTemplateCurlyInString": "off",
+        "noTemplateCurlyInString": "off"
       },
       "style": {
         // `noUncheckedIndexedAccess` is enabled, so `!` is the intended escape
         // for an access the code has already bounds-checked.
-        "noNonNullAssertion": "off",
-      },
-    },
-  },
+        "noNonNullAssertion": "off"
+      }
+    }
+  }
 }

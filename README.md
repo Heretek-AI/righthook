@@ -233,11 +233,14 @@ owned and has its own override file.
 - **Tool configuration is not generated.** righthook emits hooks, not
   `biome.json`, `ruff.toml`, `.golangci.yml` or `phpstan.neon`. A repository's
   existing config applies unchanged; one with no config gets each tool's
-  defaults. Two defaults are worth knowing about before your first push:
-  `markdownlint-cli2` enforces an 80-column limit (`MD013`) that trips on every
-  table, and `biome check .` will walk any directory you have not gitignored —
-  both are one config file away, and this repository carries the two files it
-  needed (`.markdownlint.jsonc`, `biome.jsonc`).
+  defaults. Three defaults are worth knowing before your first push, and this
+  repository carries the config each one needed:
+  - `markdownlint-cli2` enforces an 80-column limit (`MD013`) that trips on
+    every table → `.markdownlint.jsonc`.
+  - `biome check .` walks directories you have not gitignored → `vcs.useIgnoreFile`
+    in `biome.jsonc`.
+  - `prettier` and `biome` both claim `*.jsonc` and disagree on JSONC trailing
+    commas, so they rewrite each other every commit → `.prettierignore`.
 - **Go coverage is converted.** `go test` emits a Go-native profile, so the CI
   test job runs `gocov` then `gocov-xml` to produce Cobertura. If those modules
   cannot be fetched in your environment, drop the `--report go=` argument and

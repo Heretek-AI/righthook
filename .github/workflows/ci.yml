@@ -652,21 +652,7 @@ jobs:
     name: coverage gate
     if: always()
     runs-on: ubuntu-latest
-    needs:
-      [
-        test-typescript,
-        test-python,
-        test-go,
-        test-rust,
-        test-ruby,
-        test-php,
-        test-java,
-        test-kotlin,
-        test-dotnet,
-        test-swift,
-        test-dart,
-        test-cpp,
-      ]
+    needs: [test-typescript, test-python, test-go, test-rust, test-ruby, test-php, test-java, test-kotlin, test-dotnet, test-swift, test-dart, test-cpp]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -710,37 +696,7 @@ jobs:
     name: required
     if: always()
     runs-on: ubuntu-latest
-    needs:
-      [
-        lint-typescript,
-        lint-python,
-        lint-go,
-        lint-rust,
-        lint-ruby,
-        lint-php,
-        lint-java,
-        lint-kotlin,
-        lint-dotnet,
-        lint-swift,
-        lint-dart,
-        lint-cpp,
-        lint-terraform,
-        test-typescript,
-        test-python,
-        test-go,
-        test-rust,
-        test-ruby,
-        test-php,
-        test-java,
-        test-kotlin,
-        test-dotnet,
-        test-swift,
-        test-dart,
-        test-cpp,
-        security,
-        workflow-lint,
-        coverage-gate,
-      ]
+    needs: [lint-typescript, lint-python, lint-go, lint-rust, lint-ruby, lint-php, lint-java, lint-kotlin, lint-dotnet, lint-swift, lint-dart, lint-cpp, lint-terraform, test-typescript, test-python, test-go, test-rust, test-ruby, test-php, test-java, test-kotlin, test-dotnet, test-swift, test-dart, test-cpp, security, workflow-lint, coverage-gate]
     steps:
       - name: Every required job succeeded
         run: |
