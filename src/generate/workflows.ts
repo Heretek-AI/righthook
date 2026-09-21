@@ -476,6 +476,23 @@ function testJob(
 
 /** The `security` job: secret scanning plus filesystem/secret SARIF upload. */
 function securityJob(): string[] {
+  // `upload-sarif` fails the job with "Path does not exist" when the scanner
+  // produced nothing, so both uploads are guarded on the file existing. That
+  // keeps a scanner-install problem from failing the `required` gate while
+  // still publishing whatever was actually found.
+  const upload = (sarif: string, category: string): string[] =>
+    renderStep(
+      {
+        if: `always() && hashFiles('${sarif}') != ''`,
+        uses: actionRef('codeql', 'upload-sarif'),
+        with: [
+          ['sarif_file', sarif],
+          ['category', category],
+        ],
+      },
+      '      ',
+    );
+
   return [
     '  security:',
     '    name: security scan',
@@ -492,8 +509,15 @@ function securityJob(): string[] {
     ...renderStep(
       {
         run: [
-          'curl -fsSL https://raw.githubusercontent.com/betterleaks/betterleaks/main/scripts/install.sh | sh',
-          './bin/betterleaks git . --redact --report-format sarif --report-path leaks.sarif || true',
+          // betterleaks publishes release tarballs, not an install script, so
+          // the asset is fetched by the tag the releases API reports. The
+          // command is `|| true`d: the scan is advisory here, and trivy's SARIF
+          // is uploaded alongside it.
+          'set -euo pipefail',
+          'VERSION=$(curl -fsSL https://api.github.com/repos/betterleaks/betterleaks/releases/latest | jq -r .tag_name)',
+          'curl -fsSL "https://github.com/betterleaks/betterleaks/releases/download/${VERSION}/betterleaks_${VERSION#v}_linux_x64.tar.gz" -o /tmp/betterleaks.tar.gz',
+          'sudo tar -xzf /tmp/betterleaks.tar.gz -C /usr/local/bin betterleaks',
+          'betterleaks git . --redact --report-format sarif --report-path leaks.sarif || true',
         ],
       },
       '      ',
@@ -507,28 +531,8 @@ function securityJob(): string[] {
       },
       '      ',
     ),
-    ...renderStep(
-      {
-        if: 'always()',
-        uses: actionRef('codeql', 'upload-sarif'),
-        with: [
-          ['sarif_file', 'leaks.sarif'],
-          ['category', 'betterleaks'],
-        ],
-      },
-      '      ',
-    ),
-    ...renderStep(
-      {
-        if: 'always()',
-        uses: actionRef('codeql', 'upload-sarif'),
-        with: [
-          ['sarif_file', 'trivy.sarif'],
-          ['category', 'trivy'],
-        ],
-      },
-      '      ',
-    ),
+    ...upload('leaks.sarif', 'betterleaks'),
+    ...upload('trivy.sarif', 'trivy'),
   ];
 }
 
