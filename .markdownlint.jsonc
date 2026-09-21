@@ -1,0 +1,6 @@
+{
+  // markdownlint's default line length (80) fires on every table and any
+  // prose with a URL, which makes it unusable as a default gate. Long lines
+  // are a formatting preference, not a defect; the remaining rules stay on.
+  "MD013": false,
+}

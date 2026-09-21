@@ -15,41 +15,41 @@ commit and push — plus changed-line and total-coverage gates in CI.
 
 ## What it writes
 
-| File | Purpose |
-|---|---|
-| `lefthook.yml` | The hook configuration. Generated, wholly owned by righthook. |
-| `.righthook/run.sh` | Tool launcher. Skips a tool that is not installed locally. |
-| `.righthook/merge-conflicts.sh` | Blocks on leftover conflict markers. |
-| `.righthook/coverage_gate.py` | Enforces the coverage threshold over mixed report formats. |
-| `.righthook/jscpd.json`, `.righthook/osv-scanner.toml` | Configs a generated command names. |
-| `.github/workflows/righthook.yml` | The CI pipeline, narrowed to the detected languages. |
-| `.github/dependabot.yml` | One grouped, weekly entry per detected ecosystem. |
-| `.righthook/manifest.json` | sha256 of every file righthook wrote. |
+| File                                                   | Purpose                                                       |
+| ------------------------------------------------------ | ------------------------------------------------------------- |
+| `lefthook.yml`                                         | The hook configuration. Generated, wholly owned by righthook. |
+| `.righthook/run.sh`                                    | Tool launcher. Skips a tool that is not installed locally.    |
+| `.righthook/merge-conflicts.sh`                        | Blocks on leftover conflict markers.                          |
+| `.righthook/coverage_gate.py`                          | Enforces the coverage threshold over mixed report formats.    |
+| `.righthook/jscpd.json`, `.righthook/osv-scanner.toml` | Configs a generated command names.                            |
+| `.github/workflows/righthook.yml`                      | The CI pipeline, narrowed to the detected languages.          |
+| `.github/dependabot.yml`                               | One grouped, weekly entry per detected ecosystem.             |
+| `.righthook/manifest.json`                             | sha256 of every file righthook wrote.                         |
 
 `.editorconfig`, `.yamllint.yaml`, `commitlint.config.mjs` and
 `.righthook/simplecov.rb` are written only when a generated command needs them.
 
 ## Commands
 
-```
+```text
 righthook init   [options]   write the managed files and install git hooks
 righthook sync   [options]   re-render the managed files (same pipeline as init)
 righthook doctor [--json]    report which tools are installed locally
 righthook presets            print the reusable workflow and preset YAML
 ```
 
-| Option | Meaning |
-|---|---|
-| `--languages a,b` | Override detection entirely. |
-| `--add-languages x,y` | Union with what was detected. |
-| `--coverage-threshold <pct>` | Total-coverage gate in CI (default `80`). |
-| `--diff-coverage <pct>` | Changed-line gate on pull requests (default `80`). |
-| `--ci-mode vendored\|caller` | Inline the pipeline, or call the reusable workflow. |
-| `--secrets-tool betterleaks\|gitleaks` | Which secret scanner the hooks use. |
-| `--root <dir>` | Write `lefthook.yml` and `.righthook/` under `<dir>`. |
-| `--force` | Overwrite files that were modified locally. |
-| `--no-install` | Skip `lefthook install`. |
-| `--dry-run` | Print what would change; write nothing. |
+| Option                                 | Meaning                                               |
+| -------------------------------------- | ----------------------------------------------------- |
+| `--languages a,b`                      | Override detection entirely.                          |
+| `--add-languages x,y`                  | Union with what was detected.                         |
+| `--coverage-threshold <pct>`           | Total-coverage gate in CI (default `80`).             |
+| `--diff-coverage <pct>`                | Changed-line gate on pull requests (default `80`).    |
+| `--ci-mode vendored\|caller`           | Inline the pipeline, or call the reusable workflow.   |
+| `--secrets-tool betterleaks\|gitleaks` | Which secret scanner the hooks use.                   |
+| `--root <dir>`                         | Write `lefthook.yml` and `.righthook/` under `<dir>`. |
+| `--force`                              | Overwrite files that were modified locally.           |
+| `--no-install`                         | Skip `lefthook install`.                              |
+| `--dry-run`                            | Print what would change; write nothing.               |
 
 ## How enforcement works
 
@@ -57,11 +57,11 @@ righthook presets            print the reusable workflow and preset YAML
 through `.righthook/run.sh`, which exits `0` with a message when the tool is not
 installed:
 
-```
+```text
 righthook: typos not installed - skipped locally (enforced in CI)
 ```
 
-A tool that *is* installed runs normally and its own exit status blocks the
+A tool that _is_ installed runs normally and its own exit status blocks the
 commit. So the pre-commit hook is fast on a fresh clone, and nothing can be
 hidden by not installing a linter — CI runs the same checks unguarded.
 
@@ -77,22 +77,22 @@ actually staged.
 
 ## The hook matrix
 
-| Language | pre-commit | pre-push |
-|---|---|---|
-| *universal* | `betterleaks`, `typos`, `merge-conflicts`, `editorconfig-checker`, `prettier`, `shfmt`, `yamllint`, `markdownlint-cli2`, `shellcheck`, `hadolint` | `betterleaks`, `typos`, `actionlint`, `zizmor`, `osv-scanner`, `jscpd`, `trivy config` |
-| TypeScript | `biome format`+`biome lint` *(or* `prettier`+`eslint --fix`*)* | `tsc --noEmit`, `knip`, `<pm> audit`, `biome check` *(or* `eslint`*)*, `vitest`/`jest`/`node --test` |
-| Python | `ruff format`, `ruff check --fix` | `mypy` *(or* `pyright`*)*, `vulture`, `bandit`, `pip-audit`, `pytest --cov` |
-| Go | `gofmt`, `goimports`, `golangci-lint --fix` | `golangci-lint`, `govulncheck`, `go test -race` |
-| Rust | `cargo fmt`, `cargo clippy --fix` | `clippy -D warnings`, `cargo machete`, `cargo audit`, `cargo test` |
-| Ruby | `rubocop -A` | `rubocop`, `brakeman`, `bundler-audit`, `rspec`/`rake test` |
-| PHP | `php-cs-fixer`, `phpcs` | `phpstan`, `composer audit`, `phpunit` |
-| Java | `spotless:apply`, `checkstyle` | `spotbugs`, `pmd`, `mvn test` |
-| Kotlin | `ktlint --format`, `detekt` | `./gradlew test` |
-| C# / .NET | `dotnet format whitespace` | `dotnet format analyzers`, `dotnet build`, `dotnet test` |
-| Swift | `swiftformat`, `swiftlint --fix` | `swiftlint --strict`, `swift test` |
-| Dart / Flutter | `dart format`, `dart analyze` | `dart test` / `flutter test` |
-| C / C++ | `clang-format`, `cppcheck` | `ctest` |
-| Terraform | `terraform fmt`, `tflint` | `terraform validate` |
+| Language       | pre-commit                                                                                                                                        | pre-push                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| _universal_    | `betterleaks`, `typos`, `merge-conflicts`, `editorconfig-checker`, `prettier`, `shfmt`, `yamllint`, `markdownlint-cli2`, `shellcheck`, `hadolint` | `betterleaks`, `typos`, `actionlint`, `zizmor`, `osv-scanner`, `jscpd`, `trivy config`               |
+| TypeScript     | `biome format`+`biome lint` _(or_ `prettier`+`eslint --fix`_)_                                                                                    | `tsc --noEmit`, `knip`, `<pm> audit`, `biome check` _(or_ `eslint`_)_, `vitest`/`jest`/`node --test` |
+| Python         | `ruff format`, `ruff check --fix`                                                                                                                 | `mypy` _(or_ `pyright`_)_, `vulture`, `bandit`, `pip-audit`, `pytest --cov`                          |
+| Go             | `gofmt`, `goimports`, `golangci-lint --fix`                                                                                                       | `golangci-lint`, `govulncheck`, `go test -race`                                                      |
+| Rust           | `cargo fmt`, `cargo clippy --fix`                                                                                                                 | `clippy -D warnings`, `cargo machete`, `cargo audit`, `cargo test`                                   |
+| Ruby           | `rubocop -A`                                                                                                                                      | `rubocop`, `brakeman`, `bundler-audit`, `rspec`/`rake test`                                          |
+| PHP            | `php-cs-fixer`, `phpcs`                                                                                                                           | `phpstan`, `composer audit`, `phpunit`                                                               |
+| Java           | `spotless:apply`, `checkstyle`                                                                                                                    | `spotbugs`, `pmd`, `mvn test`                                                                        |
+| Kotlin         | `ktlint --format`, `detekt`                                                                                                                       | `./gradlew test`                                                                                     |
+| C# / .NET      | `dotnet format whitespace`                                                                                                                        | `dotnet format analyzers`, `dotnet build`, `dotnet test`                                             |
+| Swift          | `swiftformat`, `swiftlint --fix`                                                                                                                  | `swiftlint --strict`, `swift test`                                                                   |
+| Dart / Flutter | `dart format`, `dart analyze`                                                                                                                     | `dart test` / `flutter test`                                                                         |
+| C / C++        | `clang-format`, `cppcheck`                                                                                                                        | `ctest`                                                                                              |
+| Terraform      | `terraform fmt`, `tflint`                                                                                                                         | `terraform validate`                                                                                 |
 
 Elixir, Scala, Clojure, Haskell, Lua, Perl, R, Nix, Zig, SQL, Protobuf, OpenAPI,
 Ansible and Kubernetes are also covered. `righthook doctor` lists exactly what a
@@ -144,7 +144,7 @@ resolves `extends` paths against the **git root** rather than the including file
 upstream [issue #1258](https://github.com/evilmartians/lefthook/issues/1258)).
 Recursively extending fragments out of `node_modules` therefore requires
 hand-written `node_modules/<pkg>/...` paths and a discipline of never extending a
-preset *and* a fragment it already pulls in.
+preset _and_ a fragment it already pulls in.
 
 ```yaml
 # lefthook.yaml — one self-contained preset, no recursion
@@ -253,9 +253,19 @@ owned and has its own override file.
 
 ```sh
 npm install
-npm test          # type-check + unit tests
 npm run build     # tsc + emit presets/ and workflows/ci.yml
+npm run lint      # biome, over src/ test/ bin/
+npm test          # type-check + unit tests
+npm run check     # build + lint + test
 ```
+
+This repository is itself managed by righthook: `lefthook.yml`,
+`.righthook/` and `.github/workflows/righthook.yml` are generated artifacts
+kept in sync with `node bin/righthook.js sync`. `.github/workflows/righthook.yml`
+is a caller of the reusable definition in `workflows/ci.yml`, i.e. the package
+dogfoods the delivery mode it documents. Additions specific to this repository
+(its own typecheck and lint commands) live in `lefthook-local.yml`, exactly as
+the README tells consumers to do it.
 
 `npm run build` regenerates `presets/`, `workflows/ci.yml` and this
 repository's own `.github/workflows/ci.yml` from the same generators the CLI
