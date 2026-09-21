@@ -1,0 +1,15 @@
+name: min
+on:
+  workflow_call:
+    inputs:
+      languages:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  a:
+    name: a
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ inputs.languages }}"
