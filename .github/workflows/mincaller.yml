@@ -4,6 +4,6 @@ permissions:
   contents: read
 jobs:
   c:
-    uses: ./min.yml
+    uses: ./.github/workflows/min.yml
     with:
       languages: 'x'
