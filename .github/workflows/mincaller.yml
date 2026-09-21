@@ -1,0 +1,9 @@
+name: mincaller
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  c:
+    uses: ./min.yml
+    with:
+      languages: 'x'
