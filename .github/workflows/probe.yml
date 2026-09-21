@@ -1,0 +1,9 @@
+name: probe
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  p:
+    uses: ./.github/workflows/ci.yml
+    with:
+      languages: '["universal"]'
